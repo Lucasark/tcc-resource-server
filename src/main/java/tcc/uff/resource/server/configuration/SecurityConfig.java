@@ -23,7 +23,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(registry -> registry
-                        .requestMatchers("/", "/attendences/ws/**", "/login", "/login-error", "/app.js", "/main.css", "/loginstyle.css", "/qrcode.min.js", "/models").permitAll()
+                        .requestMatchers("/", "/attendences/ws/**", "/login", "/login-error", "/app.js", "/main.css", "/loginstyle.css", "/qrcode.min.js", "/models/**").permitAll()
                         .anyRequest().authenticated()
                 )
 //                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
