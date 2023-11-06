@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import tcc.uff.resource.server.model.enums.DayOfWeek;
-import tcc.uff.resource.server.model.enums.Frequency;
+import tcc.uff.resource.server.model.enums.DayOfWeekEnum;
+import tcc.uff.resource.server.model.enums.FrequencyEnum;
 import tcc.uff.resource.server.model.response.GenericOption;
 import tcc.uff.resource.server.model.response.SelectOption;
 import tcc.uff.resource.server.model.response.models.DaysOfWeeks;
@@ -18,12 +18,12 @@ import java.util.Arrays;
 
 @RestController
 @RequestMapping("/models")
-public class ModelsController {
+public class ModelController {
 
     @GetMapping("/daysOfWeek")
     public @ResponseBody DaysOfWeeks getDaysOfWeek() {
 
-        var days = DayOfWeek.getAllAttrbsSortedById();
+        var days = DayOfWeekEnum.getAllAttrbsSortedById();
 
         var daysResponse = new ArrayList<GenericOption>();
 
@@ -57,15 +57,15 @@ public class ModelsController {
     @GetMapping("/frequencies")
     public @ResponseBody Frequencies getFrequencies() {
 
-        var frequencies = Frequency.getAllAttrbsSortedById();
+        var frequencies = FrequencyEnum.getAllAttrbsSortedById();
 
         var frequenciesResponse = new ArrayList<GenericOption>();
 
-        frequencies.forEach(frequency ->
+        frequencies.forEach(frequencyEnum ->
                 frequenciesResponse.add(GenericOption.builder()
-                        .id(frequency.getId())
-                        .name(frequency.getName())
-                        .description(frequency.getDescription())
+                        .id(frequencyEnum.getId())
+                        .name(frequencyEnum.getName())
+                        .description(frequencyEnum.getDescription())
                         .build())
         );
 

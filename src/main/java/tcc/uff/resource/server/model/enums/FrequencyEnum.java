@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
-public enum Frequency {
+public enum FrequencyEnum {
 
     PRESENT(1, "P", "Presente"),
     MISS(2, "F", "Faltou"),
@@ -23,15 +23,13 @@ public enum Frequency {
 
     private final String description;
 
-    public static List<Frequency> getAllAttrbsSortedById() {
+    public static List<FrequencyEnum> getAllAttrbsSortedById() {
 
-        return Arrays.stream(Frequency.values())
+        return Arrays.stream(FrequencyEnum.values())
                 .collect(Collectors.toSet())
                 .stream()
-                .sorted(Comparator.comparing(Frequency::getId))
+                .sorted(Comparator.comparing(FrequencyEnum::getId))
                 .collect(Collectors.toList());
-
-
     }
 
 }

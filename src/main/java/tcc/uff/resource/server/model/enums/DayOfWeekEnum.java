@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
-public enum DayOfWeek {
+public enum DayOfWeekEnum {
 
     MONDAY(1, "Segunda-feira"),
 
@@ -30,12 +30,12 @@ public enum DayOfWeek {
 
     private final String name;
 
-    public static List<DayOfWeek> getAllAttrbsSortedById() {
+    public static List<DayOfWeekEnum> getAllAttrbsSortedById() {
 
-        return Arrays.stream(DayOfWeek.values())
+        return Arrays.stream(DayOfWeekEnum.values())
                 .collect(Collectors.toSet())
                 .stream()
-                .sorted(Comparator.comparing(DayOfWeek::getId))
+                .sorted(Comparator.comparing(DayOfWeekEnum::getId))
                 .collect(Collectors.toList());
 
 
