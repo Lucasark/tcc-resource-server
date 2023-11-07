@@ -12,4 +12,8 @@ public class PreAuthorize {
     public boolean isOwnerCourse(String name, String course) {
         return courseService.isOwnerByUser(name, course);
     }
+
+    public boolean isMemberCourse(String name, String course) {
+        return courseService.isMemberByUser(name, course);
+    }
 }

@@ -1,11 +1,12 @@
 package tcc.uff.resource.server.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tcc.uff.resource.server.model.document.AttendenceDocument;
+import tcc.uff.resource.server.model.document.AttendenceHandler;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
 import tcc.uff.resource.server.model.response.entity.AttendenceResponse;
-import tcc.uff.resource.server.repository.AttendenceRepository;
 import tcc.uff.resource.server.repository.CourseRepository;
 import tcc.uff.resource.server.repository.FrequencyRepository;
 import tcc.uff.resource.server.service.AttendenceService;
@@ -13,12 +14,16 @@ import tcc.uff.resource.server.utils.GenerateString;
 
 import java.lang.module.ResolutionException;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class AttendenceServiceImpl implements AttendenceService {
 
-    private final AttendenceRepository attendenceRepository;
+    @Autowired
+    private Map<String, AttendenceHandler> attendences = new HashMap<>();
+
     private final CourseRepository courseRepository;
     private final FrequencyRepository frequencyRepository;
 
@@ -41,18 +46,23 @@ public class AttendenceServiceImpl implements AttendenceService {
 
         courseRepository.save(courseDocument);
 
-        var attendenceDocument = attendenceRepository.save(AttendenceDocument.builder()
-                .course(courseDocument)
+        var handler = AttendenceHandler.builder()
+                .id(new ObjectId().toString())
                 .date(date.toInstant())
                 .code(code)
-                .build());
+                .build();
+
+        attendences.put(courseDocument.getId(), handler);
 
         return AttendenceResponse.builder()
-                .id(attendenceDocument.getId())
+                .id(handler.getId())
                 .date(date)
-                .code(attendenceDocument.getCode())
-                .course(attendenceDocument.getCourse().getId())
+                .code(handler.getCode())
+                .course(courseDocument.getId())
                 .build();
+    }
+
+    public void updateFrequency(String course, String attendence, String code) {
 
     }
 }

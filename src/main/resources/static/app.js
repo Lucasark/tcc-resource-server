@@ -13,11 +13,11 @@ function setConnected(connected) {
 
 function connect() {
     stompClient = new StompJs.Client({
-        brokerURL: 'ws://localhost:8080/v1/api/attendences/ws/' + $("#courseId").val(),
+        brokerURL: 'ws://localhost:8080/v1/api/attendences/ws/' + $("#attendenceId").val(),
         onConnect: (frame) => {
             setConnected(true);
             console.log('Connected: ' + frame);
-            stompClient.subscribe('/user/' + $("#attendenceId").val() + '/topic/' + $("#courseId").val(), (greeting) => {
+            stompClient.subscribe('/user/' + $("#courseId").val() + '/topic/' + $("#attendenceId").val(), (greeting) => {
                 showGreeting(greeting.body);
             })
         },

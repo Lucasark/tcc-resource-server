@@ -3,6 +3,7 @@ package tcc.uff.resource.server.configuration;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
@@ -13,8 +14,10 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.server.HandshakeInterceptor;
+import tcc.uff.resource.server.model.document.AttendenceHandler;
 import tcc.uff.resource.server.repository.CourseRepository;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -24,6 +27,9 @@ import java.util.Map;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final CourseRepository courseRepository;
+
+    @Autowired
+    private Map<String, AttendenceHandler> attendences = new HashMap<>();
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {

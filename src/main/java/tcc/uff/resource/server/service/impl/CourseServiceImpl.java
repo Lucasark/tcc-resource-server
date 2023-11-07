@@ -50,6 +50,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public boolean isMemberByUser(String username, String course) {
+        var list = getAllCourserMemberByUser(username);
+        return list.stream().anyMatch(c -> c.getId().equals(course));    }
+
+    @Override
     public CourseResponse createCourse(CourseRequest courseRequest, String owner) {
         var curse = this.mapper.map(courseRequest, CourseDocument.class);
         var user = userRepository.findById(owner);

@@ -12,6 +12,7 @@ public interface CourseService {
     List<CourseResponse> getAllCourserMemberByUser(String username);
 
     boolean isOwnerByUser(String username, String course);
+    boolean isMemberByUser(String username, String course);
 
     CourseResponse createCourse(CourseRequest courseRequest, String owner);
 }
