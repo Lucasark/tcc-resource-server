@@ -1,5 +1,8 @@
 package tcc.uff.resource.server.controller;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,19 +38,20 @@ public class CourseController {
     private final CourseService courseService;
 
     @GetMapping("/owner")
+    @Operation(summary = "Pegar todos so cursos que sou Dono")
     public ResponseEntity<List<CourseResponse>> getAllCoursesOwnerByAuth(Authentication authentication) {
         return ResponseEntity.ok(courseService.getAllCourserOwnerByUser(authentication.getName()));
     }
 
     @GetMapping("/member")
+    @Operation(summary = "Pegar todos so cursos que sou Membro")
     public ResponseEntity<List<CourseResponse>> getAllCoursesMemberByAuth(Authentication authentication) {
         return ResponseEntity.ok(courseService.getAllCourserMemberByUser(authentication.getName()));
     }
 
     @GetMapping("/{courseId}")
     @ResponseStatus(HttpStatus.OK)
-    //TODO: Validar a necessidade de ser apenas o dono poder ver
-//    @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
+    @Operation(summary = "Pegar a Info de um curso")
     public ResponseEntity<CourseResponse> getInfoCourse(Authentication authentication,
                                                         @PathVariable("courseId") String courseId) {
         return ResponseEntity.ok(courseService.getCourse(courseId));
@@ -56,6 +60,7 @@ public class CourseController {
 
     @PatchMapping("/{courseId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @Operation(summary = "Atualizar Determinados campos do Curso")
     @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
     public ResponseEntity<CourseResponse> patchCourse(Authentication authentication,
                                                       @RequestBody CourseRequest request,
@@ -65,6 +70,7 @@ public class CourseController {
     }
 
     @PostMapping()
+    @Operation(summary = "Criar um curso")
     public ResponseEntity<CourseResponse> createCourse(Authentication authentication,
                                                        @RequestBody @Valid CourseRequest request
     ) {
@@ -73,6 +79,7 @@ public class CourseController {
 
     @DeleteMapping("/{courseId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @Operation(summary = "Deletar um curso")
     @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
     public void deleteCourse(Authentication authentication,
                              @PathVariable String courseId
@@ -83,6 +90,7 @@ public class CourseController {
 
 
     @PatchMapping("/{courseId}/member")
+    @Operation(summary = "Adicionar um membro ao Curso - Obrigatorio ser o Dono")
     @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
     public ResponseEntity<CourseResponse> addMember(Authentication authentication,
                                                     @RequestBody @Valid UserAddRequest userAddRequest,
@@ -91,14 +99,14 @@ public class CourseController {
         return ResponseEntity.ok(courseService.addMember(courseId, userAddRequest.getEmail(), userAddRequest.getAlias(), userAddRequest.getRegistration()));
     }
 
-    //TODO: Validar
-//    @PatchMapping("/{courseId}/member/batch")
-//    @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
-//    public ResponseEntity<CourseResponse> addBatchMember(Authentication authentication,
-//                                                         @RequestBody @Valid UserAddInBatchRequest userAddInBatchRequest,
-//                                                         @PathVariable String courseId
-//    ) {
-////        return ResponseEntity.ok(courseService.includeMember(courseId, memberId));
-//        return null;
-//    }
+    @PatchMapping("/{courseId}/member/batch")
+    @Operation(summary = "(W.I.P) - Adicionar pacote de membros ao Curso - Obrigatorio ser o Dono - (W.I.P)")
+    @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
+    public ResponseEntity<CourseResponse> addBatchMember(Authentication authentication,
+                                                         @RequestBody @Valid UserAddInBatchRequest userAddInBatchRequest,
+                                                         @PathVariable String courseId
+    ) {
+//        return ResponseEntity.ok(courseService.includeMember(courseId, memberId));
+        return null;
+    }
 }
