@@ -82,7 +82,7 @@ public class CourseController {
     }
 
 
-    @PatchMapping("/{courseId}/add")
+    @PatchMapping("/{courseId}/member")
     @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
     public ResponseEntity<CourseResponse> addMember(Authentication authentication,
                                                     @RequestBody @Valid UserAddRequest userAddRequest,
@@ -92,7 +92,7 @@ public class CourseController {
     }
 
     //TODO: Validar
-//    @PatchMapping("/{courseId}/add/batch")
+//    @PatchMapping("/{courseId}/member/batch")
 //    @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
 //    public ResponseEntity<CourseResponse> addBatchMember(Authentication authentication,
 //                                                         @RequestBody @Valid UserAddInBatchRequest userAddInBatchRequest,
