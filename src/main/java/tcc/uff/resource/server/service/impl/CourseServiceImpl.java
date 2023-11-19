@@ -10,7 +10,6 @@ import tcc.uff.resource.server.model.document.UserAlias;
 import tcc.uff.resource.server.model.document.UserDocument;
 import tcc.uff.resource.server.model.request.CourseRequest;
 import tcc.uff.resource.server.model.response.entity.CourseResponse;
-import tcc.uff.resource.server.model.response.entity.UserResponse;
 import tcc.uff.resource.server.repository.CourseRepository;
 import tcc.uff.resource.server.repository.UserRepository;
 import tcc.uff.resource.server.service.CourseService;
@@ -86,14 +85,7 @@ public class CourseServiceImpl implements CourseService {
 
         courseRepository.save(document);
 
-        var response = this.mapper.map(document, CourseResponse.class);
-        response.setOwner(document.getTeacher().getEmail());
-
-        document.getMembers().forEach(member ->
-                response.getMembers().add(UserResponse.builder().email(member.getEmail()).name(member.getName()).build())
-        );
-
-        return response;
+        return courseResponseConverter.toCourseResponse(document);
     }
 
     @Override
@@ -103,16 +95,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseResponse getCourse(String courseId) {
-        var document = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("N achou o curso!"));
-
-        var response = this.mapper.map(document, CourseResponse.class);
-        response.setOwner(document.getTeacher().getEmail());
-
-        document.getMembers().forEach(member ->
-                response.getMembers().add(UserResponse.builder().email(member.getEmail()).name(member.getName()).build())
-        );
-
-        return response;
+        return courseResponseConverter.toCourseResponse(courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("N achou o curso!")));
     }
 
 
