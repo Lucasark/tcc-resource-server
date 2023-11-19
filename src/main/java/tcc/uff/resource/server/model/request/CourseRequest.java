@@ -21,7 +21,7 @@ public class CourseRequest {
     private String period;
 
     @Builder.Default
-    private Set<LocalDateTime> daysOfWeeks = new HashSet<>();
+    private Set<DaysOfWeekRequest> daysOfWeeks = new HashSet<>();
 
     private String about;
 

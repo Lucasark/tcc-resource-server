@@ -1,4 +1,4 @@
-package tcc.uff.resource.server.model.document;
+package tcc.uff.resource.server.model.handler;
 
 import lombok.Builder;
 import lombok.Getter;

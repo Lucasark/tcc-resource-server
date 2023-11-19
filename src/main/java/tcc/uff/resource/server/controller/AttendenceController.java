@@ -4,9 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tcc.uff.resource.server.model.request.AttendenceRequest;
+import tcc.uff.resource.server.model.response.entity.AttendenceResponse;
 import tcc.uff.resource.server.service.impl.AttendenceServiceImpl;
 
 @Slf4j
@@ -29,27 +31,20 @@ public class AttendenceController {
     @PostMapping("/courses/{courseId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
-    public Object createAttendence(@Valid @RequestBody AttendenceRequest request,
-                                   @PathVariable String courseId
+    public ResponseEntity<AttendenceResponse> createAttendence(@Valid @RequestBody AttendenceRequest request,
+                                                               @PathVariable String courseId
     ) {
-        return attendenceService.createAttendence(courseId, request.getDate());
+        return ResponseEntity.ok(attendenceService.createAttendence(courseId, request.getDate()));
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @PutMapping("{attendenceId}/courses/{courseId}/codes/{code}")
+    @PutMapping("/courses/{courseId}/codes/{code}")
     @PreAuthorize("@preAuthorize.isMemberCourse(authentication.name, #courseId)")
-    public Object updateFrequency(@PathVariable String courseId,
-                                  @PathVariable String attendenceId,
-                                  @PathVariable String code
+    public void updateFrequency(Authentication authentication,
+                                @PathVariable String courseId,
+                                @PathVariable String code
     ) {
-        attendenceService.updateFrequency("", "", "");
-        return null;
+        attendenceService.updateFrequency(courseId, code, authentication.getName());
     }
 
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    @GetMapping()
-    public Object updateFrequency(
-    ) {
-        return null;
-    }
 }

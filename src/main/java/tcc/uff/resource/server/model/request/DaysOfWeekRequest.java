@@ -1,4 +1,4 @@
-package tcc.uff.resource.server.model.document;
+package tcc.uff.resource.server.model.request;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class DaysOfWeek {
+public class DaysOfWeekRequest {
 
     private LocalDateTime start;
 

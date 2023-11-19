@@ -24,7 +24,7 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers("/", "/attendences/ws/**", "/login", "/login-error", "/app.js", "/main.css",
-                                "/loginstyle.css", "/qrcode.min.js", "/models/**", "/swagger-ui/**", "/v3/**").permitAll()
+                                "/loginstyle.css", "/qrcode.min.js", "/models/**", "/swagger-ui/**", "/v3/**", "/test/**").permitAll()
                         .anyRequest().authenticated()
                 )
 //                .cors(cors -> cors.configurationSource(corsConfigurationSource()))

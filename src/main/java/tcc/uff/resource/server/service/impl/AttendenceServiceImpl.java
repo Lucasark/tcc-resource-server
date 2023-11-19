@@ -4,15 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tcc.uff.resource.server.model.document.AttendenceHandler;
+import tcc.uff.resource.server.model.document.Attendance;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
+import tcc.uff.resource.server.model.handler.AttendenceHandler;
 import tcc.uff.resource.server.model.response.entity.AttendenceResponse;
 import tcc.uff.resource.server.repository.CourseRepository;
 import tcc.uff.resource.server.repository.FrequencyRepository;
+import tcc.uff.resource.server.repository.UserRepository;
 import tcc.uff.resource.server.service.AttendenceService;
 import tcc.uff.resource.server.utils.GenerateString;
 
-import java.lang.module.ResolutionException;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,14 +27,13 @@ public class AttendenceServiceImpl implements AttendenceService {
 
     private final CourseRepository courseRepository;
     private final FrequencyRepository frequencyRepository;
+    private final UserRepository userRepository;
 
     public AttendenceResponse createAttendence(String course, OffsetDateTime date) {
 
         var code = GenerateString.generateRandomString(10);
 
-        var courseDocument = courseRepository.findById(course).orElseThrow(
-                ResolutionException::new
-        );
+        var courseDocument = courseRepository.findById(course).orElseThrow(() -> new RuntimeException("N achou Classe!"));
 
         var frequencyNew = FrequencyDocument.builder()
                 .course(courseDocument)
@@ -41,10 +41,6 @@ public class AttendenceServiceImpl implements AttendenceService {
                 .build();
 
         frequencyRepository.save(frequencyNew);
-
-        courseDocument.getFrequencies().add(frequencyNew);
-
-        courseRepository.save(courseDocument);
 
         var handler = AttendenceHandler.builder()
                 .id(new ObjectId().toString())
@@ -62,7 +58,24 @@ public class AttendenceServiceImpl implements AttendenceService {
                 .build();
     }
 
-    public void updateFrequency(String course, String attendence, String code) {
+    public void updateFrequency(String course, String code, String member) {
+        var attendenceHandler = attendences.get(course);
 
+        if (attendenceHandler.getCode().equals(code)) {
+            var frequency = frequencyRepository.findByDate(attendenceHandler.getDate())
+                    .orElseThrow(() -> new RuntimeException("Frequencia n existe!"));
+
+            if (frequency.getAttendances().stream().anyMatch(a -> a.getStudent().getEmail().equals(member)))
+                throw new RuntimeException("Já marcou presença!");
+
+            var user = userRepository.findById(member).orElseThrow(() -> new RuntimeException("N achou User!"));
+
+            frequency.getAttendances().add(Attendance.builder()
+                    .status(Boolean.TRUE)
+                    .student(user)
+                    .build());
+
+            frequencyRepository.save(frequency);
+        }
     }
 }

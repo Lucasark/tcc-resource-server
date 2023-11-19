@@ -14,7 +14,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.server.HandshakeInterceptor;
-import tcc.uff.resource.server.model.document.AttendenceHandler;
+import tcc.uff.resource.server.model.handler.AttendenceHandler;
 import tcc.uff.resource.server.repository.CourseRepository;
 
 import java.util.HashMap;

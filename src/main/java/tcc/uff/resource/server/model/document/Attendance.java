@@ -1,4 +1,4 @@
-package tcc.uff.resource.server.model.handler;
+package tcc.uff.resource.server.model.document;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +14,7 @@ public class Attendance {
     @DBRef
     private UserDocument student;
 
-    private Integer status;
+    @Builder.Default
+    private Boolean status = Boolean.FALSE;
 
 }

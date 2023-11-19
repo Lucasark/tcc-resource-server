@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import tcc.uff.resource.server.model.document.AttendenceHandler;
+import tcc.uff.resource.server.model.handler.AttendenceHandler;
 import tcc.uff.resource.server.utils.GenerateString;
 
 import java.util.HashMap;

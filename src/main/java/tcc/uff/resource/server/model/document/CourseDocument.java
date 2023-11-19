@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,7 +36,7 @@ public class CourseDocument {
      * Is it not relatated to Frequency, is it just info about
      */
     @Builder.Default
-    private Set<LocalDateTime> daysOfWeeks = new HashSet<>();
+    private Set<DaysOfWeek> daysOfWeeks = new HashSet<>();
 
     private String about;
 
@@ -48,8 +47,9 @@ public class CourseDocument {
     @Builder.Default
     private Set<UserDocument> members = new HashSet<>();
 
-    @DBRef(lazy = true)
+
+    //Embed
     @Builder.Default
-    private Set<FrequencyDocument> frequencies = new HashSet<>();
+    private Set<String> frequencies = new HashSet<>();
 
 }

@@ -15,4 +15,13 @@ public interface CourseService {
     boolean isMemberByUser(String username, String course);
 
     CourseResponse createCourse(CourseRequest courseRequest, String owner);
+
+    CourseResponse patchCourse(CourseRequest courseRequest, String courseId);
+
+    void deleteCourse(String courseId);
+
+    CourseResponse getCourse(String courseId);
+
+    CourseResponse addMember(String courseId, String memberId, String memberAlias, String memberRegistration);
+
 }

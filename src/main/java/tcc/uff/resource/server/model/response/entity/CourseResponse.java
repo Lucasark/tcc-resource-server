@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -22,10 +22,13 @@ public class CourseResponse {
 
     private String period;
 
-    private Set<LocalDateTime> daysOfWeeks;
+    private Set<DaysOfWeekResponse> daysOfWeeks;
 
     private String about;
 
     private String owner;
+
+    @Builder.Default
+    private Set<UserResponse> members = new HashSet<>();
 
 }

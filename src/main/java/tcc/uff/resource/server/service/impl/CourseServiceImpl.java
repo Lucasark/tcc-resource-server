@@ -3,15 +3,20 @@ package tcc.uff.resource.server.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import tcc.uff.resource.server.converter.CourseResponseConverter;
 import tcc.uff.resource.server.model.document.CourseDocument;
+import tcc.uff.resource.server.model.document.DaysOfWeek;
+import tcc.uff.resource.server.model.document.UserAlias;
+import tcc.uff.resource.server.model.document.UserDocument;
 import tcc.uff.resource.server.model.request.CourseRequest;
 import tcc.uff.resource.server.model.response.entity.CourseResponse;
+import tcc.uff.resource.server.model.response.entity.UserResponse;
 import tcc.uff.resource.server.repository.CourseRepository;
 import tcc.uff.resource.server.repository.UserRepository;
 import tcc.uff.resource.server.service.CourseService;
+import tcc.uff.resource.server.service.mongooperations.MongoOperationsService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +26,11 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
 
+    private final CourseResponseConverter courseResponseConverter;
+
     private final UserRepository userRepository;
+
+    private final MongoOperationsService mongoOperations;
 
     @Override
     public List<CourseResponse> getAllCourserOwnerByUser(String username) {
@@ -30,7 +39,7 @@ public class CourseServiceImpl implements CourseService {
             var mapped = mapper.map(element, CourseResponse.class);
             mapped.setOwner(element.getTeacher().getEmail());
             return mapped;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     @Override
@@ -40,7 +49,7 @@ public class CourseServiceImpl implements CourseService {
             var mapped = mapper.map(element, CourseResponse.class);
             mapped.setOwner(element.getTeacher().getEmail());
             return mapped;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     @Override
@@ -52,18 +61,93 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public boolean isMemberByUser(String username, String course) {
         var list = getAllCourserMemberByUser(username);
-        return list.stream().anyMatch(c -> c.getId().equals(course));    }
+        return list.stream().anyMatch(c -> c.getId().equals(course));
+    }
 
     @Override
     public CourseResponse createCourse(CourseRequest courseRequest, String owner) {
         var curse = this.mapper.map(courseRequest, CourseDocument.class);
-        var user = userRepository.findById(owner);
-        if (user.isEmpty()) throw new RuntimeException("N achou!");
-        curse.setTeacher(user.get());
+        var user = userRepository.findById(owner).orElseThrow(() -> new RuntimeException("N achou o User!"));
+        curse.setTeacher(user);
         var courseNew = courseRepository.save(curse);
         var response = this.mapper.map(courseNew, CourseResponse.class);
         response.setOwner(courseNew.getTeacher().getEmail());
         return response;
+    }
+
+    @Override
+    public CourseResponse patchCourse(CourseRequest courseRequest, String courseId) {
+        var document = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("N achou o curso!"));
+
+        document.setName(courseRequest.getName());
+        document.setPeriod(courseRequest.getPeriod());
+        document.setAbout(courseRequest.getAbout());
+        courseRequest.getDaysOfWeeks().forEach(days -> document.getDaysOfWeeks().add(this.mapper.map(days, DaysOfWeek.class)));
+
+        courseRepository.save(document);
+
+        var response = this.mapper.map(document, CourseResponse.class);
+        response.setOwner(document.getTeacher().getEmail());
+
+        document.getMembers().forEach(member ->
+                response.getMembers().add(UserResponse.builder().email(member.getEmail()).name(member.getName()).build())
+        );
+
+        return response;
+    }
+
+    @Override
+    public void deleteCourse(String courseId) {
+        courseRepository.deleteById(courseId);
+    }
+
+    @Override
+    public CourseResponse getCourse(String courseId) {
+        var document = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("N achou o curso!"));
+
+        var response = this.mapper.map(document, CourseResponse.class);
+        response.setOwner(document.getTeacher().getEmail());
+
+        document.getMembers().forEach(member ->
+                response.getMembers().add(UserResponse.builder().email(member.getEmail()).name(member.getName()).build())
+        );
+
+        return response;
+    }
+
+
+    @Override
+    public CourseResponse addMember(String courseId, String memberId, String memberAlias, String memberRegistration) {
+        var document = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("N achou o curso!"));
+
+        if (document.getMembers().stream().anyMatch(user -> user.getEmail().equals(memberId)))
+            throw new RuntimeException("Já está incluso!");
+
+        if (document.getTeacher().getEmail().equals(memberId))
+            throw new RuntimeException("Voce n pode se incluir como membro sendo dono!");
+
+        var user = userRepository.findById(memberId)
+                .orElseGet(() -> {
+                    var passiveUser = UserDocument.builder()
+                            .email(memberId)
+                            .registration(memberRegistration)
+                            .build();
+
+                    return userRepository.save(passiveUser);
+                });
+
+        user.getAliases().add(UserAlias.builder()
+                .name(memberAlias)
+                .courseId(courseId)
+                .build());
+
+        mongoOperations.addInSet("email", user.getEmail(), "aliases",
+                UserAlias.builder().name(memberAlias).courseId(courseId).build(), UserDocument.class);
+
+        mongoOperations.addInSet("id", courseId, "members", user, CourseDocument.class);
+
+        return courseResponseConverter.toCourseResponse(courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Erro ao recuperar ")));
     }
 
 }
