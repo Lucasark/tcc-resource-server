@@ -1,23 +1,22 @@
 package tcc.uff.resource.server.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tcc.uff.resource.server.model.document.Attendance;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
+import tcc.uff.resource.server.model.enums.AttendenceEnum;
 import tcc.uff.resource.server.model.handler.AttendenceHandler;
-import tcc.uff.resource.server.model.response.entity.AttendenceResponse;
-import tcc.uff.resource.server.repository.CourseRepository;
 import tcc.uff.resource.server.repository.FrequencyRepository;
 import tcc.uff.resource.server.repository.UserRepository;
 import tcc.uff.resource.server.service.AttendenceService;
-import tcc.uff.resource.server.utils.GenerateString;
+import tcc.uff.resource.server.service.mongooperations.MongoOperationsService;
 
-import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AttendenceServiceImpl implements AttendenceService {
@@ -25,38 +24,9 @@ public class AttendenceServiceImpl implements AttendenceService {
     @Autowired
     private Map<String, AttendenceHandler> attendences = new HashMap<>();
 
-    private final CourseRepository courseRepository;
     private final FrequencyRepository frequencyRepository;
     private final UserRepository userRepository;
-
-    public AttendenceResponse createAttendence(String course, OffsetDateTime date) {
-
-        var code = GenerateString.generateRandomString(10);
-
-        var courseDocument = courseRepository.findById(course).orElseThrow(() -> new RuntimeException("N achou Classe!"));
-
-        var frequencyNew = FrequencyDocument.builder()
-                .course(courseDocument)
-                .date(date.toInstant())
-                .build();
-
-        frequencyRepository.save(frequencyNew);
-
-        var handler = AttendenceHandler.builder()
-                .id(new ObjectId().toString())
-                .date(date.toInstant())
-                .code(code)
-                .build();
-
-        attendences.put(courseDocument.getId(), handler);
-
-        return AttendenceResponse.builder()
-                .id(handler.getId())
-                .date(date)
-                .code(handler.getCode())
-                .course(courseDocument.getId())
-                .build();
-    }
+    private final MongoOperationsService mongoOperationsService;
 
     public void updateFrequency(String course, String code, String member) {
         var attendenceHandler = attendences.get(course);
@@ -71,11 +41,34 @@ public class AttendenceServiceImpl implements AttendenceService {
             var user = userRepository.findById(member).orElseThrow(() -> new RuntimeException("N achou User!"));
 
             frequency.getAttendances().add(Attendance.builder()
-                    .status(Boolean.TRUE)
+                    .status(AttendenceEnum.PRESENT)
                     .student(user)
                     .build());
 
             frequencyRepository.save(frequency);
         }
+    }
+
+    public void updateAttedentceStatusByMember(String frequencyId, String memberId, Integer status) {
+        var toAttendance = AttendenceEnum.fromId(status);
+
+        var frequency = frequencyRepository.findById(frequencyId)
+                .orElseThrow(() -> new RuntimeException("N existe Frequencia"));
+
+        for (Attendance attendance : frequency.getAttendances()) {
+            if (attendance.getStudent().getEmail().equals(memberId)) {
+                attendance.setStatus(toAttendance);
+                frequencyRepository.save(frequency);
+                return;
+            }
+        }
+
+        mongoOperationsService.addInSet("id", frequencyId,
+                "attendances", Attendance.builder()
+                        .student(userRepository.findById(memberId).orElseThrow(() -> new RuntimeException("Membro n existe")))
+                        .status(toAttendance)
+                        .build(),
+                FrequencyDocument.class
+        );
     }
 }

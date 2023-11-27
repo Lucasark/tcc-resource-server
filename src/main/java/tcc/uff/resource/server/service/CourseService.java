@@ -23,5 +23,4 @@ public interface CourseService {
     CourseResponse getCourse(String courseId);
 
     CourseResponse addMember(String courseId, String memberId, String memberAlias, String memberRegistration);
-
 }

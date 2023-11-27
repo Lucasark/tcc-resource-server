@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import tcc.uff.resource.server.model.enums.DayOfWeekEnum;
-import tcc.uff.resource.server.model.enums.FrequencyEnum;
+import tcc.uff.resource.server.model.enums.AttendenceEnum;
 import tcc.uff.resource.server.model.response.GenericOption;
 import tcc.uff.resource.server.model.response.SelectOption;
 import tcc.uff.resource.server.model.response.models.DaysOfWeeks;
@@ -57,15 +57,15 @@ public class ModelController {
     @GetMapping("/frequencies")
     public @ResponseBody Frequencies getFrequencies() {
 
-        var frequencies = FrequencyEnum.getAllAttrbsSortedById();
+        var frequencies = AttendenceEnum.getAllAttrbsSortedById();
 
         var frequenciesResponse = new ArrayList<GenericOption>();
 
-        frequencies.forEach(frequencyEnum ->
+        frequencies.forEach(attendenceEnum ->
                 frequenciesResponse.add(GenericOption.builder()
-                        .id(frequencyEnum.getId())
-                        .name(frequencyEnum.getName())
-                        .description(frequencyEnum.getDescription())
+                        .id(attendenceEnum.getId())
+                        .name(attendenceEnum.getName())
+                        .description(attendenceEnum.getDescription())
                         .build())
         );
 

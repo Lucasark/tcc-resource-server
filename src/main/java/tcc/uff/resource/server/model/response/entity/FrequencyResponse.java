@@ -14,7 +14,7 @@ import static tcc.uff.resource.server.utils.Constants.OFF_DATE_TIME_PATTERN;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendenceResponse {
+public class FrequencyResponse {
 
     private String id;
 

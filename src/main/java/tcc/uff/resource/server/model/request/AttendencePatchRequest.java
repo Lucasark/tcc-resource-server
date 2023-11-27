@@ -1,22 +1,18 @@
 package tcc.uff.resource.server.model.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.time.Instant;
-
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DaysOfWeekRequest {
+public class AttendencePatchRequest {
 
-    private Instant start;
-
-    private Instant end;
+    @NotNull
+    private Integer status;
 
 }

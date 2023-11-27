@@ -22,7 +22,7 @@ public class CourseResponse {
 
     private String period;
 
-    private Set<DaysOfWeekResponse> daysOfWeeks;
+    private Set<DaysOfWeekResponse> daysOfWeek;
 
     private String about;
 

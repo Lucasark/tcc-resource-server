@@ -1,12 +1,12 @@
 package tcc.uff.resource.server.model.document;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -27,7 +27,6 @@ public class CourseDocument {
     @MongoId(targetType = FieldType.OBJECT_ID)
     private String id;
 
-    @Indexed(unique = true)
     private String name;
 
     private String period;
@@ -36,11 +35,12 @@ public class CourseDocument {
      * Is it not relatated to Frequency, is it just info about
      */
     @Builder.Default
-    private Set<DaysOfWeek> daysOfWeeks = new HashSet<>();
+    private Set<DaysOfWeek> daysOfWeek = new HashSet<>();
 
     private String about;
 
     @DBRef
+    @NotNull
     private UserDocument teacher;
 
     @DBRef

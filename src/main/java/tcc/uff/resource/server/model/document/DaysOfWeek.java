@@ -1,18 +1,22 @@
 package tcc.uff.resource.server.model.document;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DaysOfWeek {
 
-    private LocalDateTime start;
+    private Instant start;
 
-    private LocalDateTime end;
+    private Instant end;
 
 }

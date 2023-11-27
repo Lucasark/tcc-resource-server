@@ -81,7 +81,7 @@ public class CourseServiceImpl implements CourseService {
         document.setName(courseRequest.getName());
         document.setPeriod(courseRequest.getPeriod());
         document.setAbout(courseRequest.getAbout());
-        courseRequest.getDaysOfWeeks().forEach(days -> document.getDaysOfWeeks().add(this.mapper.map(days, DaysOfWeek.class)));
+        courseRequest.getDaysOfWeek().forEach(days -> document.getDaysOfWeek().add(this.mapper.map(days, DaysOfWeek.class)));
 
         courseRepository.save(document);
 
@@ -131,7 +131,9 @@ public class CourseServiceImpl implements CourseService {
 
         mongoOperations.addInSet("id", courseId, "members", user, CourseDocument.class);
 
-        return courseResponseConverter.toCourseResponse(courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Erro ao recuperar ")));
+        return courseResponseConverter.toCourseResponse(courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Erro ao recuperar"))
+        );
     }
 
 }
