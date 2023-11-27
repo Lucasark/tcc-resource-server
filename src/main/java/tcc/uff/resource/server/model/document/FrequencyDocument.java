@@ -1,5 +1,6 @@
 package tcc.uff.resource.server.model.document;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +28,7 @@ public class FrequencyDocument {
     private String id;
 
     @DBRef
+    @NotNull
     @Indexed(unique = true)
     private CourseDocument course;
 

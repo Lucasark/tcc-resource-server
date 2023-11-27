@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +20,7 @@ public class CourseRequest {
     private String period;
 
     @Builder.Default
-    private Set<DaysOfWeekRequest> daysOfWeeks = new HashSet<>();
+    private Set<DaysOfWeekRequest> daysOfWeek = new HashSet<>();
 
     private String about;
 

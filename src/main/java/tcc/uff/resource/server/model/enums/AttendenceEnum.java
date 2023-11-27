@@ -6,11 +6,12 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
-public enum FrequencyEnum {
+public enum AttendenceEnum {
 
     PRESENT(1, "P", "Presente"),
     MISS(2, "F", "Faltou"),
@@ -23,13 +24,20 @@ public enum FrequencyEnum {
 
     private final String description;
 
-    public static List<FrequencyEnum> getAllAttrbsSortedById() {
+    public static List<AttendenceEnum> getAllAttrbsSortedById() {
 
-        return Arrays.stream(FrequencyEnum.values())
+        return Arrays.stream(AttendenceEnum.values())
                 .collect(Collectors.toSet())
                 .stream()
-                .sorted(Comparator.comparing(FrequencyEnum::getId))
+                .sorted(Comparator.comparing(AttendenceEnum::getId))
                 .collect(Collectors.toList());
+    }
+
+    public static AttendenceEnum fromId(Integer type) {
+        return Arrays.stream(values())
+                .filter(file -> Objects.equals(file.getId(), type))
+                .findFirst()
+                .orElse(UNDEFINED);
     }
 
 }
