@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -51,5 +52,8 @@ public class CourseDocument {
     //Embed
     @Builder.Default
     private Set<String> frequencies = new HashSet<>();
+
+    @Version
+    private Long version;
 
 }

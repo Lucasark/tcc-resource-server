@@ -83,7 +83,6 @@ public class CourseController {
     public void deleteCourse(Authentication authentication,
                              @PathVariable String courseId
     ) {
-        //TODO: Deletar alias tbm
         courseService.deleteCourse(courseId);
     }
 

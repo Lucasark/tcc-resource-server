@@ -89,6 +89,14 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteCourse(String courseId) {
+        var document = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("N achou o curso!"));
+
+        document.getMembers().forEach(user -> {
+            user.getAliases().removeIf(userPredicate -> userPredicate.getCourseId().equals(courseId));
+            userRepository.save(user);
+        });
+
         courseRepository.deleteById(courseId);
     }
 

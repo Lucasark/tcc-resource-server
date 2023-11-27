@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -37,5 +38,8 @@ public class FrequencyDocument {
 
     @Builder.Default
     private Set<Attendance> attendances = new HashSet<>();
+
+    @Version
+    private Long version;
 
 }

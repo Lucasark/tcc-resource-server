@@ -17,10 +17,12 @@ public class UserServiceImpl implements UserService {
 
     private final ModelMapper mapper;
 
+    @Override
     public UserResponse getInfoUser(String email) {
 
         var document = userRepository.findById(email).orElseThrow(() -> new RuntimeException("N achou user!"));
 
         return this.mapper.map(document, UserResponse.class);
     }
+
 }
