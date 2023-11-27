@@ -68,19 +68,18 @@ public class CourseServiceImpl implements CourseService {
         var curse = this.mapper.map(courseRequest, CourseDocument.class);
         var user = userRepository.findById(owner).orElseThrow(() -> new RuntimeException("N achou o User!"));
         curse.setTeacher(user);
-        var courseNew = courseRepository.save(curse);
-        var response = this.mapper.map(courseNew, CourseResponse.class);
-        response.setOwner(courseNew.getTeacher().getEmail());
-        return response;
+        courseRepository.save(curse);
+        return courseResponseConverter.toCourseResponse(curse);
     }
 
     @Override
-    public CourseResponse patchCourse(CourseRequest courseRequest, String courseId) {
+    public CourseResponse putCourse(CourseRequest courseRequest, String courseId) {
         var document = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("N achou o curso!"));
 
         document.setName(courseRequest.getName());
         document.setPeriod(courseRequest.getPeriod());
         document.setAbout(courseRequest.getAbout());
+        document.getDaysOfWeek().clear();
         courseRequest.getDaysOfWeek().forEach(days -> document.getDaysOfWeek().add(this.mapper.map(days, DaysOfWeek.class)));
 
         courseRepository.save(document);

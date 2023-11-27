@@ -16,7 +16,7 @@ public interface CourseService {
 
     CourseResponse createCourse(CourseRequest courseRequest, String owner);
 
-    CourseResponse patchCourse(CourseRequest courseRequest, String courseId);
+    CourseResponse putCourse(CourseRequest courseRequest, String courseId);
 
     void deleteCourse(String courseId);
 
