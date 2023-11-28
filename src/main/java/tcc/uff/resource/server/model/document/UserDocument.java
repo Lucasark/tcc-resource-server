@@ -21,10 +21,24 @@ public class UserDocument {
     @Id
     private String email;
 
+    /**
+     * OAuth
+     */
     private String name;
 
+    /**
+     * Se vier do:
+     *
+     * - OAuth
+     * - Dono do User altearando
+     * - Pela Planilha
+     *
+     */
     private String registration;
 
+    /**
+     * O que vem da planilha
+     */
     @Builder.Default
     private Set<UserAlias> aliases = new HashSet<>();
 

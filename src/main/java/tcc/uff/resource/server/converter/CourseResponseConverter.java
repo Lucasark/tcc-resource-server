@@ -20,11 +20,12 @@ public class CourseResponseConverter {
 
         var response = this.mapper.map(document, CourseResponse.class);
         response.setOwner(document.getTeacher().getEmail());
+        response.getMembers().clear();
 
         document.getMembers().forEach(memberDocument -> {
 
                     String alias = memberDocument.getAliases().stream()
-                            .filter(f -> f.getCourseId().equals(document.getId()))
+                            .filter(userFilter -> userFilter.getCourseId().equals(document.getId()))
                             .map(UserAlias::getName)
                             .findFirst()
                             .orElse("S/A");
@@ -32,7 +33,6 @@ public class CourseResponseConverter {
                     response.getMembers().add(
                             UserResponse.builder()
                                     .email(memberDocument.getEmail())
-                                    .name(memberDocument.getName())
                                     .alias(alias)
                                     .build()
                     );
