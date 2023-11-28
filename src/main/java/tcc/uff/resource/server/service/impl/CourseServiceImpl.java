@@ -34,21 +34,13 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<CourseResponse> getAllCourserOwnerByUser(String username) {
         var allDocuments = courseRepository.findByTeacherEmail(username);
-        return allDocuments.stream().map(element -> {
-            var mapped = mapper.map(element, CourseResponse.class);
-            mapped.setOwner(element.getTeacher().getEmail());
-            return mapped;
-        }).toList();
+        return allDocuments.stream().map(courseResponseConverter::toCourseResponse).toList();
     }
 
     @Override
     public List<CourseResponse> getAllCourserMemberByUser(String username) {
         var allDocuments = courseRepository.findByMembersEmail(username);
-        return allDocuments.stream().map(element -> {
-            var mapped = mapper.map(element, CourseResponse.class);
-            mapped.setOwner(element.getTeacher().getEmail());
-            return mapped;
-        }).toList();
+        return allDocuments.stream().map(courseResponseConverter::toCourseResponse).toList();
     }
 
     @Override
