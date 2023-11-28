@@ -33,6 +33,7 @@ public class CourseResponseConverter {
                     response.getMembers().add(
                             UserResponse.builder()
                                     .email(memberDocument.getEmail())
+                                    .registration(memberDocument.getRegistration())
                                     .alias(alias)
                                     .build()
                     );
