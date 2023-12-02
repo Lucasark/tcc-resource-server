@@ -2,57 +2,59 @@ package tcc.uff.resource.server.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tcc.uff.resource.server.model.document.CourseDocument;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
-import tcc.uff.resource.server.model.handler.AttendenceHandler;
 import tcc.uff.resource.server.model.response.entity.FrequencyResponse;
 import tcc.uff.resource.server.repository.CourseRepository;
 import tcc.uff.resource.server.repository.FrequencyRepository;
-import tcc.uff.resource.server.utils.GenerateString;
+import tcc.uff.resource.server.service.mongooperations.MongoOperationsService;
 
-import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Instant;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FrequencyServiceImpl {
 
-    @Autowired
-    private Map<String, AttendenceHandler> attendences = new HashMap<>();
-
     private final CourseRepository courseRepository;
+
     private final FrequencyRepository frequencyRepository;
 
-    public FrequencyResponse initFrenquency(String course, OffsetDateTime date) {
+    private final MongoOperationsService mongoOperationsService;
 
-        var code = GenerateString.generateRandomString(10);
+    public FrequencyResponse initFrenquency(String course, Instant date) throws RuntimeException {
 
         var courseDocument = courseRepository.findById(course)
                 .orElseThrow(() -> new RuntimeException("N achou Classe!"));
 
+        /*TODO:
+        - Impede de criar uma nova frequencia se uma ainda está ativa?
+        - Recupera a anterior?
+        - Finaliza a anterior e inicia uma nova?
+        */
+        isCourseHasActivedFrequency(courseDocument);
+
+        frequencyRepository.findByDateAndCourseId(date, course).ifPresent(found -> {
+            if (found.getFinished()) {
+                //TODO: Pode reiniziar umas chamada?
+                throw new RuntimeException("Esta Chamada já foi finalizada!");
+            }
+            throw new RuntimeException("Esta chamada já existe, ingressar no WS!");
+        });
+
         var frequencyNew = FrequencyDocument.builder()
                 .course(courseDocument)
-                .date(date.toInstant())
+                .date(date)
                 .build();
 
         frequencyRepository.save(frequencyNew);
 
-        var handler = AttendenceHandler.builder()
-                .id(new ObjectId().toString())
-                .date(date.toInstant())
-                .code(code)
-                .build();
-
-        attendences.put(courseDocument.getId(), handler);
+        mongoOperationsService.addInSet("id", course, "frequencies", frequencyNew.getId(), CourseDocument.class);
 
         return FrequencyResponse.builder()
-                .id(handler.getId())
+                .id(frequencyNew.getId())
                 .date(date)
-                .code(handler.getCode())
                 .course(courseDocument.getId())
                 .build();
     }
@@ -62,5 +64,12 @@ public class FrequencyServiceImpl {
                 .orElseThrow(() -> new RuntimeException("Frequencia n existe"));
 
         return frequecy.getCourse().getTeacher().getEmail().equals(teacher);
+    }
+
+    private boolean isCourseHasActivedFrequency(CourseDocument courseDocument) {
+
+        var frequencies = frequencyRepository.findAllById(courseDocument.getFrequencies());
+
+        return frequencies.parallelStream().anyMatch(value -> Boolean.FALSE.equals(value.getFinished()));
     }
 }
