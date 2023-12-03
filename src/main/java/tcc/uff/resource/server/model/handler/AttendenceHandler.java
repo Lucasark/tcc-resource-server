@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.time.Instant;
 
@@ -26,6 +27,8 @@ public class AttendenceHandler {
 
     @Builder.Default
     private Boolean joined = Boolean.FALSE;
+
+    private WebSocketSession session;
 
 
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tcc.uff.resource.server.model.document.CourseDocument;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
 import tcc.uff.resource.server.model.handler.AttendenceHandler;
 import tcc.uff.resource.server.model.response.entity.FrequencyResponse;
@@ -62,5 +63,12 @@ public class FrequencyServiceImpl {
                 .orElseThrow(() -> new RuntimeException("Frequencia n existe"));
 
         return frequecy.getCourse().getTeacher().getEmail().equals(teacher);
+    }
+
+    private boolean isCourseHasActivedFrequency(CourseDocument courseDocument) {
+
+        var frequencies = frequencyRepository.findAllById(courseDocument.getFrequencies());
+
+        return frequencies.parallelStream().anyMatch(value -> Boolean.FALSE.equals(value.getFinished()));
     }
 }

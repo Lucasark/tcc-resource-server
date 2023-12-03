@@ -11,4 +11,7 @@ import java.util.Optional;
 public interface FrequencyRepository extends MongoRepository<FrequencyDocument, String> {
 
     Optional<FrequencyDocument> findByDate(Instant date);
+
+    Optional<FrequencyDocument> findByDateAndCourseId(Instant date, String courseId);
+
 }
