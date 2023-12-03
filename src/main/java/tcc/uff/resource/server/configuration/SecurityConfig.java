@@ -1,9 +1,11 @@
 package tcc.uff.resource.server.configuration;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.jwt.SupplierJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -28,12 +30,23 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(registry -> registry
-                        .requestMatchers("/", "/attendences/ws/**", "/login", "/login-error", "/app.js", "/main.css",
-                                "/loginstyle.css", "/qrcode.min.js", "/models/**", "/swagger-ui/**", "/v3/**", "/test/**").permitAll()
+                        .requestMatchers("/", "/login", "/login-error", "/app.js", "/main.css", "/*.js", "/*.swf",
+                                "/loginstyle.css", "/qrcode.min.js", "/models/**", "/swagger-ui/**", "/v3/**","/attendences/ws/**",  "/*.js", "/*.swf", "/*.ico").permitAll()
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults()))
                 .build();
+    }
+
+    @Bean
+    public FilterRegistrationBean<WebSocketAuthCookie> webSocketCookieBearerTokenAuthorisationFilterRegistration(SupplierJwtDecoder decoder){
+        FilterRegistrationBean<WebSocketAuthCookie> registrationBean = new FilterRegistrationBean<>();
+
+        registrationBean.setFilter(new WebSocketAuthCookie(decoder));
+        registrationBean.addUrlPatterns("/attendences/ws/*");
+        registrationBean.setOrder(2);
+
+        return registrationBean;
     }
 }

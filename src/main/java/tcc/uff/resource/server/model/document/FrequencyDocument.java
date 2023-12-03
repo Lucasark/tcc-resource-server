@@ -4,16 +4,18 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,16 +32,25 @@ public class FrequencyDocument {
 
     @DBRef
     @NotNull
-    @Indexed(unique = true)
     private CourseDocument course;
 
-    @Indexed(background = true)
     private Instant date;
 
     @Builder.Default
     private Set<Attendance> attendances = new HashSet<>();
 
+    @Builder.Default
+    private Boolean finished = Boolean.FALSE;
+
+    private LocalDateTime finishedAt;
+
     @Version
     private Long version;
+
+    @CreatedDate
+    protected LocalDateTime createdAt;
+
+    @LastModifiedDate
+    protected LocalDateTime updatedAt;
 
 }

@@ -3,56 +3,54 @@ package tcc.uff.resource.server.configuration;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 import tcc.uff.resource.server.model.handler.AttendenceHandler;
-import tcc.uff.resource.server.repository.CourseRepository;
+import tcc.uff.resource.server.service.impl.FrequencyServiceImpl;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 @Configuration
+@EnableWebSocket
 @RequiredArgsConstructor
-@EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final CourseRepository courseRepository;
+    private final Map<String, WebSocketSession> sessions;
 
-    @Autowired
-    private Map<String, AttendenceHandler> attendences = new HashMap<>();
+    private final Map<String, AttendenceHandler> attendences;
 
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/user");
-        config.setUserDestinationPrefix("/user");
-        config.setApplicationDestinationPrefixes("/app");
-    }
+    private final FrequencyServiceImpl frequencyService;
 
     @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/attendences/ws/*")
-                .addInterceptors(auctionInterceptor())
-                .setAllowedOrigins("*");
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(new CustomWebSocketHandler(sessions, attendences), "/attendences/ws/*")
+                .setAllowedOriginPatterns("*")
+                .setAllowedOrigins("*")
+                .addInterceptors(auctionInterceptor());
     }
 
     @Bean
     public HandshakeInterceptor auctionInterceptor() {
+
         return new HandshakeInterceptor() {
             public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
-                                           WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
+                                           WebSocketHandler wsHandler, Map<String, Object> attributes) {
 
                 String path = request.getURI().getPath();
-                String auctionId = path.substring(path.lastIndexOf('/') + 1);
+//                UriTemplate uriTemplate = new UriTemplate("/v1/api/attendences/ws/courses/{courseId}/dates/{date}");
+//                var courseId = uriTemplate.match(path).get("courseId");
+//                var date = Instant.parse(uriTemplate.match(path).get("date"));
+
+//                frequencyService.initFrenquency(courseId, date);
 
                 return true;
             }

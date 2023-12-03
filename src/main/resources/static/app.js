@@ -1,6 +1,26 @@
-let stompClient;
+/**
+ * ==========================================================================================
+ * ==========================================================================================
+ * ==========================================================================================
+ * ==========================================================================================
+ * ==========================================================================================
+ *
+ *
+ *                     NAO USAR ESSA LIB PARA CONECTAR COM O WEB-SOCKET
+ *
+ * ==========================================================================================
+ * ==========================================================================================
+ * ==========================================================================================
+ * ==========================================================================================
+ * ==========================================================================================
+ */
+
+console.log("NAO USAR ESSA LIB PARA CONECTAR COM O WEB-SOCKET");
+
+let ws;
 
 function setConnected(connected) {
+    console.log("CONECTADO")
     $("#connect").prop("disabled", connected);
     $("#disconnect").prop("disabled", !connected);
     if (connected) {
@@ -11,34 +31,45 @@ function setConnected(connected) {
     $("#greetings").html("");
 }
 
+function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    let expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
 function connect() {
-    stompClient = new StompJs.Client({
-        brokerURL: 'ws://localhost:8080/v1/api/attendences/ws/' + $("#attendenceId").val(),
-        onConnect: (frame) => {
-            setConnected(true);
-            console.log('Connected: ' + frame);
-            stompClient.subscribe('/user/' + $("#courseId").val() + '/topic/' + $("#attendenceId").val(), (greeting) => {
-                showGreeting(greeting.body);
-            })
-        },
+    WEB_SOCKET_SWF_LOCATION = "WebSocketMain.swf";
 
-        onWebSocketError: (error) => {
-            console.error('Error with websocket', error);
-        },
+    ws = new WebSocket("ws://localhost:8080/v1/api/attendences/ws/" + $("#frequencyId").val());
 
-        onStompError: (frame) => {
-            console.error('Broker reported error: ' + frame.headers['message']);
-            console.error('Additional details: ' + frame.body);
-        }
-    });
+    ws.onopen = function (e) {
+        console.log("OPEN: ", e)
+        setConnected(true);
+    };
 
-    stompClient.activate();
+    ws.onmessage = function (e) {
+        showGreeting(e.data)
+    };
+
+    ws.onclose = function (e) {
+        console.log("C" + e)
+        disconnect();
+    };
+
+    ws.onerror = function (e) {
+        console.log("E: " + e)
+    }
 }
 
 function disconnect() {
-    stompClient.deactivate();
+    ws.close();
     setConnected(false);
     console.log("Disconnected");
+
+    $("#code").html("");
+    $("#qrcode").html("")
+
 }
 
 function showGreeting(message) {
@@ -51,5 +82,5 @@ $(function () {
     $("form").on('submit', (e) => e.preventDefault());
     $("#connect").click(() => connect());
     $("#disconnect").click(() => disconnect());
-    $("#send").click(() => sendName());
+    $("#send").click(() => setCookie("token", $("#token").val(), 10));
 });

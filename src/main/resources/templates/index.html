@@ -7,7 +7,8 @@
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<!--    <script src="https://cdn.jsdelivr.net/npm/node-qrcode@0.0.4/index.min.js"></script>-->
+    <script type="text/javascript" src="/v1/api/swfobject.js"></script>
+    <script type="text/javascript" src="/v1/api/web_socket.js"></script>
     <script type="text/javascript" src="/v1/api/qrcode.min.js"></script>
     <script src="/v1/api/app.js"></script>
 </head>
@@ -30,8 +31,8 @@
         <div class="col-md-6">
             <form class="form-inline">
                 <div class="form-group">
-                    <label for="name">What is your name?</label>
-                    <input type="text" id="name" class="form-control" placeholder="Your name here...">
+                    <label for="token">Token</label>
+                    <input type="text" id="token" class="form-control" placeholder="Your token here...">
                 </div>
                 <button id="send" class="btn btn-default" type="submit">Send</button>
             </form>
@@ -41,16 +42,16 @@
         <div class="col-md-6">
             <form class="form-inline">
                 <div class="form-group">
-                    <label for="attendenceId">attendenceId</label>
-                    <input type="text" id="attendenceId" class="form-control" placeholder="attendenceId">
+                    <label for="frequencyId">frequencyId</label>
+                    <input type="text" id="frequencyId" class="form-control" placeholder="frequencyId">
                 </div>
             </form>
-            <form class="form-inline">
-                <div class="form-group">
-                    <label for="courseId">courseId</label>
-                    <input type="text" id="courseId" class="form-control" placeholder="courseId">
-                </div>
-            </form>
+            <!--            <form class="form-inline">-->
+            <!--                <div class="form-group">-->
+            <!--                    <label for="courseId">courseId</label>-->
+            <!--                    <input type="text" id="courseId" class="form-control" placeholder="courseId">-->
+            <!--                </div>-->
+            <!--            </form>-->
         </div>
     </div>
     <div class="row">
