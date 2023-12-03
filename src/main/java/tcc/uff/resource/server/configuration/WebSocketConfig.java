@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -29,9 +30,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final FrequencyServiceImpl frequencyService;
 
+    private final TaskScheduler taskScheduler;
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new CustomWebSocketHandler(attendences), "/attendences/ws/courses/{c}/dates/{d}")
+        registry.addHandler(new CustomWebSocketHandler(taskScheduler, attendences), "/attendences/ws/courses/{courseId}/dates/{date}")
                 .setAllowedOriginPatterns("*")
                 .setAllowedOrigins("*")
                 .addInterceptors(auctionInterceptor());
@@ -57,7 +60,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
             public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                        WebSocketHandler wsHandler, Exception exception) {
 
-                log.info("aqui");
+
             }
         };
     }

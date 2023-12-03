@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.time.Instant;
+import java.util.concurrent.ScheduledFuture;
 
 @Getter
 @Setter
@@ -29,6 +30,8 @@ public class AttendenceHandler {
     private Boolean joined = Boolean.FALSE;
 
     private WebSocketSession session;
+
+    private ScheduledFuture<?> scheduled;
 
 
 }
