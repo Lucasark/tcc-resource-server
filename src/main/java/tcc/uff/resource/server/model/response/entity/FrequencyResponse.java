@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 import static tcc.uff.resource.server.utils.Constants.OFF_DATE_TIME_PATTERN;
 
@@ -19,7 +19,7 @@ public class FrequencyResponse {
     private String id;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = OFF_DATE_TIME_PATTERN)
-    private OffsetDateTime date;
+    private Instant date;
 
     private String code;
 

@@ -30,7 +30,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(registry -> registry
-                        .requestMatchers("/", "/login", "/login-error", "/app.js", "/main.css", "/*.js", "/*.swf",
+                        .requestMatchers("/", "/login", "/login-error", "/app.js", "/main.css", "/*.js", "/*.swf", "/test/**", "/error/**",
                                 "/loginstyle.css", "/qrcode.min.js", "/models/**", "/swagger-ui/**", "/v3/**","/attendences/ws/**",  "/*.js", "/*.swf", "/*.ico").permitAll()
                         .anyRequest().authenticated()
                 )

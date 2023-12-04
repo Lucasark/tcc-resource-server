@@ -72,15 +72,15 @@ public class FrequencyController {
     //		}
 
 
-    @PostMapping("/courses/{courseId}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    @Operation(summary = "Cria uma Chamada para um Curso")
-    @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
-    public ResponseEntity<FrequencyResponse> createAttendence(@Valid @RequestBody AttendenceRequest request,
-                                                              @PathVariable String courseId
-    ) {
-        return ResponseEntity.ok(frequencyService.initFrenquency(courseId, request.getDate()));
-    }
+//    @PostMapping("/courses/{courseId}")
+//    @ResponseStatus(HttpStatus.ACCEPTED)
+//    @Operation(summary = "Cria uma Chamada para um Curso")
+//    @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
+//    public ResponseEntity<FrequencyResponse> createAttendence(@Valid @RequestBody AttendenceRequest request,
+//                                                              @PathVariable String courseId
+//    ) {
+//        return ResponseEntity.ok(frequencyService.initFrenquency(courseId, request.getDate()));
+//    }
 
 
 }

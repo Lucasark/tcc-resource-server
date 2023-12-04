@@ -1,15 +1,13 @@
 package tcc.uff.resource.server.model.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tcc.uff.resource.server.converter.Instant2StringConverter;
 
-import java.time.OffsetDateTime;
-
-import static tcc.uff.resource.server.utils.Constants.OFF_DATE_TIME_PATTERN;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -17,8 +15,7 @@ import static tcc.uff.resource.server.utils.Constants.OFF_DATE_TIME_PATTERN;
 @AllArgsConstructor
 public class AttendenceRequest {
 
-    @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = OFF_DATE_TIME_PATTERN)
-    private OffsetDateTime date;
+    @JsonSerialize(converter = Instant2StringConverter.class)
+    private Instant date;
 
 }

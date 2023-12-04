@@ -14,7 +14,9 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 import org.springframework.web.util.UriTemplate;
+import tcc.uff.resource.server.handler.AttendenceWebSocketHandler;
 import tcc.uff.resource.server.model.handler.AttendenceHandler;
+import tcc.uff.resource.server.service.CourseService;
 import tcc.uff.resource.server.service.impl.FrequencyServiceImpl;
 
 import java.time.Instant;
@@ -32,9 +34,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final TaskScheduler taskScheduler;
 
+    private final CourseService courseService;
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new CustomWebSocketHandler(taskScheduler, attendences), "/attendences/ws/courses/{courseId}/dates/{date}")
+        registry.addHandler(new AttendenceWebSocketHandler(taskScheduler, attendences, courseService), "/attendences/ws/courses/{courseId}/dates/{date}")
                 .setAllowedOriginPatterns("*")
                 .setAllowedOrigins("*")
                 .addInterceptors(auctionInterceptor());
@@ -52,7 +56,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 var courseId = uriTemplate.match(path).get("courseId");
                 var date = Instant.parse(uriTemplate.match(path).get("date"));
 
-//                frequencyService.initFrenquency(courseId, date);
+                attributes.put("courseId", courseId);
+                attributes.put("date", date);
 
                 return true;
             }
@@ -60,7 +65,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
             public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                        WebSocketHandler wsHandler, Exception exception) {
 
-
+                log.debug("AFTERHANDSHAKE");
             }
         };
     }

@@ -15,9 +15,8 @@ import java.util.concurrent.ScheduledFuture;
 public class AttendenceHandler {
 
     @NonNull
-    private String id;
+    private String courseId;
 
-    @NonNull
     private String code;
 
     @NonNull
@@ -25,9 +24,6 @@ public class AttendenceHandler {
 
     @Builder.Default
     private Integer repeat = 0;
-
-    @Builder.Default
-    private Boolean joined = Boolean.FALSE;
 
     private WebSocketSession session;
 

@@ -6,11 +6,14 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.SupplierJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.web.filter.OncePerRequestFilter;
+import tcc.uff.resource.server.model.response.ErrorResponse;
+import tcc.uff.resource.server.utils.MethodsUtils;
 
 import java.io.IOException;
 
@@ -28,6 +31,11 @@ public class WebSocketAuthCookie extends OncePerRequestFilter {
                                     FilterChain filterChain
     ) throws ServletException, IOException {
 
+        if (request.getCookies() == null) {
+            responseUnauthorized(response);
+            return;
+        }
+
         for (Cookie cookie : request.getCookies()) {
             if ("token".equals(cookie.getName())) {
                 var auth = jwtAuthenticationProvider.authenticate(new BearerTokenAuthenticationToken(cookie.getValue()));
@@ -37,6 +45,16 @@ public class WebSocketAuthCookie extends OncePerRequestFilter {
             }
         }
 
-        throw new RuntimeException("No JWT token present in cookies");
+        responseUnauthorized(response);
+    }
+
+    private void responseUnauthorized(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.getWriter().write(MethodsUtils.convertObjectToJson(
+                ErrorResponse.builder()
+                        .message("Não autorizado!")
+                        .description("Obrigatorio incluir nos Cookies o Token com contexto 'token' !")
+                        .build()
+        ));
     }
 }

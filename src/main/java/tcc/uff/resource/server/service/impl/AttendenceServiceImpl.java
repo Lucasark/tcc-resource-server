@@ -21,9 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AttendenceServiceImpl implements AttendenceService {
 
-    @Autowired
-    private Map<String, AttendenceHandler> attendences = new HashMap<>();
-
+    private final Map<String, AttendenceHandler> attendences;
     private final FrequencyRepository frequencyRepository;
     private final UserRepository userRepository;
     private final MongoOperationsService mongoOperationsService;
