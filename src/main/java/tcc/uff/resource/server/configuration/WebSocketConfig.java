@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.scheduling.TaskScheduler;
@@ -50,14 +51,18 @@ public class WebSocketConfig implements WebSocketConfigurer {
         return new HandshakeInterceptor() {
             public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                            WebSocketHandler wsHandler, Map<String, Object> attributes) {
+                try {
+                    String path = request.getURI().getPath();
+                    UriTemplate uriTemplate = new UriTemplate("/v1/api/attendences/ws/courses/{courseId}/dates/{date}");
+                    var courseId = uriTemplate.match(path).get("courseId");
+                    var date = Instant.parse(uriTemplate.match(path).get("date"));
 
-                String path = request.getURI().getPath();
-                UriTemplate uriTemplate = new UriTemplate("/v1/api/attendences/ws/courses/{courseId}/dates/{date}");
-                var courseId = uriTemplate.match(path).get("courseId");
-                var date = Instant.parse(uriTemplate.match(path).get("date"));
-
-                attributes.put("courseId", courseId);
-                attributes.put("date", date);
+                    attributes.put("courseId", courseId);
+                    attributes.put("date", date);
+                } catch (Exception e) {
+                    response.setStatusCode(HttpStatus.I_AM_A_TEAPOT);
+                    return false;
+                }
 
                 return true;
             }
