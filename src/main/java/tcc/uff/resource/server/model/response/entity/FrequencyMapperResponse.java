@@ -5,18 +5,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FrequencyResponse {
+public class FrequencyMapperResponse {
 
     private String id;
 
-    private Instant date;
+    private String alias;
 
-    private Integer status;
+    @Builder.Default
+    private Set<FrequencyResponse> frequencies = new HashSet<>();
 }

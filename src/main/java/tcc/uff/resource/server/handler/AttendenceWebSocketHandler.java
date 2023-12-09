@@ -61,17 +61,15 @@ public class AttendenceWebSocketHandler extends AbstractWebSocketHandler {
 
         /*TODO:
 
-        - Impede de criar uma nova frequencia se uma ainda está ativa?
+        - Impede de criar uma nova frequencia se uma ainda está ativa? Sim, fazero fluxo de error esquixito e perguntar qual é a data lá
 
             Validar com o Joao
 
-        - Recupera a anterior? Esse aqui n da pq a session é unitaria, so se fosse um STOPM, mas é canhao pra matar formiga, alem de violar seguranca
-
-            Viola o fluxo: CONNECT -> HANDSHAKE -> MESSAGE, pq iria fakear o CONNECT com antigo
-
-        - Finaliza a anterior e inicia uma nova?
+        - Finaliza a anterior e inicia uma nova? Nao! Mas se for a mesma sessao entra!
 
             Atualmente essa, é o que mercado de Socket implementa, WPP, Telegram e afins; claro, esses que não STOMP, como MessageServer, já que é Biderecioanl
+
+        - Finaliza pela sessao, sendo ela depois de X tempo! Ou via, desconect!
         */
 
         if (attendences.containsKey(courseId)) {

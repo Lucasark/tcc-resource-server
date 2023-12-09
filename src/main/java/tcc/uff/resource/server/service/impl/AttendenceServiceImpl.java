@@ -30,20 +30,21 @@ public class AttendenceServiceImpl implements AttendenceService {
         var attendenceHandler = attendences.get(course);
 
         if (attendenceHandler.getCode().equals(code)) {
-            var frequency = frequencyRepository.findByDate(attendenceHandler.getDate())
+            var frequency = frequencyRepository.findByDateAndCourseId(attendenceHandler.getDate(), course)
                     .orElseThrow(() -> new RuntimeException("Frequencia n existe!"));
 
             if (frequency.getAttendances().stream().anyMatch(a -> a.getStudent().getEmail().equals(member)))
                 throw new RuntimeException("Já marcou presença!");
 
-            var user = userRepository.findById(member).orElseThrow(() -> new RuntimeException("N achou User!"));
+            var user = userRepository.findById(member)
+                    .orElseThrow(() -> new RuntimeException("N achou User!"));
 
-            frequency.getAttendances().add(Attendance.builder()
+            var a = Attendance.builder()
                     .status(AttendenceEnum.PRESENT)
                     .student(user)
-                    .build());
+                    .build();
 
-            frequencyRepository.save(frequency);
+            mongoOperationsService.addInSet("id", frequency.getId(), "attendances", a, FrequencyDocument.class);
         }
     }
 
