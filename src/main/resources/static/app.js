@@ -21,7 +21,7 @@ function setCookie(cname, cvalue, exdays) {
 
 function connect() {
 
-    ws = new WebSocket("ws://localhost:8080/v1/api/attendences/ws/courses/" + $("#courseId").val() + "/dates/" + $("#dates").val());
+    ws = new WebSocket("ws://resource-server-89f6660ebc95.herokuapp.com/v1/api/attendences/ws/courses/" + $("#courseId").val() + "/dates/" + $("#dates").val());
 
     ws.onopen = function (e) {
         console.log("OPEN: ", e)
