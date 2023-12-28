@@ -23,7 +23,6 @@ public class ScheduledTaskExecutor implements Runnable {
     public void run() {
         try {
             var code = GenerateString.generateRandomString(10);
-            log.debug("MESSAGE: " + attendence.getCourseId());
             attendence.setCode(code);
             attendence.getSession().sendMessage(new TextMessage(code));
         } catch (IOException e) {

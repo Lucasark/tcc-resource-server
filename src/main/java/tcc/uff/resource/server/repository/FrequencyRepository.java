@@ -15,6 +15,8 @@ public interface FrequencyRepository extends MongoRepository<FrequencyDocument, 
 
     Optional<FrequencyDocument> findByDateAndCourseId(Instant date, String courseId);
     List<FrequencyDocument> findByDateBetweenAndCourseId(Instant start, Instant end, String courseId);
-    List<FrequencyDocument> findAllIdAndFinished(Iterable<String> ids, Boolean finished);
+//    List<FrequencyDocument> findAllByIdAndFinished(String id, Boolean finished);
+//
+//    List<FrequencyDocument> findBy(String id);
 
 }

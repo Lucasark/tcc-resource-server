@@ -20,4 +20,6 @@ public class ErrorResponse {
     @NonNull
     private String description;
 
+    private String code;
+
 }

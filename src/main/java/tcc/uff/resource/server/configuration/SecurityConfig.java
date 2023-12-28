@@ -31,8 +31,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(registry -> registry
-                        .requestMatchers("/", "/login", "/login-error", "/*.css", "/*.js", "/*.swf", "/test/**", "/error/**", "/models/**",
-                                "/swagger-ui/**", "/v3/**","/attendences/ws/**", "/*.ico").permitAll()
+                        .requestMatchers("/", "/login", "/login-error", "/*.css", "/*.js", "/*.swf", "/tests/**", "/error/**", "/models/**",
+                                "/swagger-ui/**", "/v3/**","/attendances/ws/**", "/*.ico").permitAll()
                         .anyRequest().authenticated()
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -50,7 +50,7 @@ public class SecurityConfig {
         FilterRegistrationBean<WebSocketAuthCookie> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(new WebSocketAuthCookie(decoder));
-        registrationBean.addUrlPatterns("/attendences/ws/*");
+        registrationBean.addUrlPatterns("/attendances/ws/*");
         registrationBean.setOrder(2);
 
         return registrationBean;
