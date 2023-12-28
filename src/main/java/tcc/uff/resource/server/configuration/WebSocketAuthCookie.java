@@ -2,7 +2,6 @@ package tcc.uff.resource.server.configuration;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -31,18 +30,16 @@ public class WebSocketAuthCookie extends OncePerRequestFilter {
                                     FilterChain filterChain
     ) throws ServletException, IOException {
 
-        if (request.getCookies() == null) {
-            responseUnauthorized(response);
-            return;
-        }
+        var a = request.getHeader("sec-websocket-protocol");
 
-        for (Cookie cookie : request.getCookies()) {
-            if ("token".equals(cookie.getName())) {
-                var auth = jwtAuthenticationProvider.authenticate(new BearerTokenAuthenticationToken(cookie.getValue()));
-                SecurityContextHolder.getContext().setAuthentication(auth);
-                filterChain.doFilter(request, response);
-                return;
-            }
+        log.info("ENTREI AQUI! " + a);
+
+        if (a != null) {
+            var auth = jwtAuthenticationProvider.authenticate(new BearerTokenAuthenticationToken(a));
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            filterChain.doFilter(request, response);
+            log.info("CABOU!" + a);
+            return;
         }
 
         responseUnauthorized(response);
