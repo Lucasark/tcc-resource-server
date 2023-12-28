@@ -30,15 +30,12 @@ public class WebSocketAuthCookie extends OncePerRequestFilter {
                                     FilterChain filterChain
     ) throws ServletException, IOException {
 
-        var a = request.getHeader("sec-websocket-protocol");
+        var header = request.getHeader("sec-websocket-protocol");
 
-        log.info("ENTREI AQUI! " + a);
-
-        if (a != null) {
-            var auth = jwtAuthenticationProvider.authenticate(new BearerTokenAuthenticationToken(a));
+        if (header != null) {
+            var auth = jwtAuthenticationProvider.authenticate(new BearerTokenAuthenticationToken(header));
             SecurityContextHolder.getContext().setAuthentication(auth);
             filterChain.doFilter(request, response);
-            log.info("CABOU!" + a);
             return;
         }
 

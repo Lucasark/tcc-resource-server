@@ -1,5 +1,6 @@
 package tcc.uff.resource.server.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.TaskScheduler;
@@ -9,13 +10,17 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import tcc.uff.resource.server.model.handler.AttendenceHandler;
+import tcc.uff.resource.server.model.response.ErrorResponse;
 import tcc.uff.resource.server.service.CourseService;
+import tcc.uff.resource.server.service.impl.FrequencyServiceImpl;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import static org.springframework.web.socket.CloseStatus.POLICY_VIOLATION;
 import static org.springframework.web.socket.CloseStatus.SERVER_ERROR;
 
 @Slf4j
@@ -40,7 +45,7 @@ public class AttendenceWebSocketHandler extends AbstractWebSocketHandler {
 
     private final CourseService courseService;
 
-//    private final FrequencyServiceImpl frequencyService;
+    private final FrequencyServiceImpl frequencyService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws IOException {
@@ -59,39 +64,35 @@ public class AttendenceWebSocketHandler extends AbstractWebSocketHandler {
             return;
         }
 
-        /*TODO:
-
-        - Impede de criar uma nova frequencia se uma ainda está ativa? Sim, fazero fluxo de error esquixito e perguntar qual é a data lá
-
-            Validar com o Joao
-
-        - Finaliza a anterior e inicia uma nova? Nao! Mas se for a mesma sessao entra!
-
-            Atualmente essa, é o que mercado de Socket implementa, WPP, Telegram e afins; claro, esses que não STOMP, como MessageServer, já que é Biderecioanl
-
-        - Finaliza pela sessao, sendo ela depois de X tempo! Ou via, desconect!
-        */
-
         if (attendences.containsKey(courseId)) {
 
-            //TODO: Se já em uma sessao aberta? Atualmente vibe WPP e Telegram
             var oldAttendence = attendences.get(courseId);
 
             if (oldAttendence.getSession().isOpen()) {
                 oldAttendence.getSession().close();
             } else {
-                //Muito especifico... mas vai que, neh..
                 finisheSessionByCourseId(courseId);
             }
 
         }
 
-//        isCourseHasActivedFrequency(courseDocument);
+        var actived = frequencyService.allActivedFrequencyByCourse(courseId);
 
-//        frequencyService.initFrenquency();
+        if (!actived.isEmpty()) {
+            String result = actived.stream()
+                    .map(v -> v.getDate().toString())
+                    .collect(Collectors.joining(", "));
 
+            var response = ErrorResponse.builder()
+                    .message("Já existe uma Frequencia Ativa")
+                    .description(result)
+                    .build();
+
+            session.close(POLICY_VIOLATION.withReason(new ObjectMapper().writeValueAsString(response)));
+        }
 
         //Fluxo para criar uma nova
+        frequencyService.initFrenquency(courseId, date);
 
         var attendence = AttendenceHandler.builder()
                 .courseId(courseId)

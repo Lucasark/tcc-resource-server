@@ -39,7 +39,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new AttendenceWebSocketHandler(taskScheduler, attendences, courseService), "/attendences/ws/courses/{courseId}/dates/{date}")
+        registry.addHandler(new AttendenceWebSocketHandler(taskScheduler, attendences, courseService, frequencyService), "/attendences/ws/courses/{courseId}/dates/{date}")
                 .setAllowedOriginPatterns("*")
                 .setAllowedOrigins("*")
                 .addInterceptors(auctionInterceptor());

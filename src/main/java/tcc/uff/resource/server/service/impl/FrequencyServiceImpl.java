@@ -60,11 +60,12 @@ public class FrequencyServiceImpl {
         return frequecy.getCourse().getTeacher().getEmail().equals(teacher);
     }
 
-    public boolean isCourseHasActivedFrequency(CourseDocument courseDocument) {
+    public List<FrequencyDocument> allActivedFrequencyByCourse(String courseId) {
 
-        var frequencies = frequencyRepository.findAllById(courseDocument.getFrequencies());
+        var course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Curso n existe!"));
 
-        return frequencies.parallelStream().anyMatch(value -> Boolean.FALSE.equals(value.getFinished()));
+        return frequencyRepository.findAllIdAndFinished(course.getFrequencies(), Boolean.TRUE);
+
     }
 
     public boolean isFrequencyFinishedByDate(String courseId, Instant date) {
@@ -99,18 +100,18 @@ public class FrequencyServiceImpl {
 
         //TODO: Pelo Pai, Do Filho e Do Espirito Santo...On^3 tranformar em Mapperes
 
-        frequencyRepository.findByDateBetweenAndCourseId(start, end, courseId)
-                .forEach(frequencyDocument -> {
-                    frequencyDocument.getAttendances()
-                            .forEach(attendance -> {
+        frequencyRepository.findByDateBetweenAndCourseId(start, end, courseId).forEach(frequencyDocument -> {
+                    frequencyDocument.getAttendances().forEach(attendance -> {
                                 mapResponse.get(attendance.getStudent().getEmail()).getFrequencies()
                                         .add(FrequencyResponse.builder()
                                                 .id(frequencyDocument.getId())
                                                 .date(frequencyDocument.getDate())
                                                 .status(attendance.getStatus().getId())
                                                 .build());
-                            });
-                });
+                            }
+                    );
+                }
+        );
 
         return new ArrayList<>(mapResponse.values());
     }
