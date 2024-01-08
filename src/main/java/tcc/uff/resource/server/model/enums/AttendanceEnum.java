@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
-public enum AttendenceEnum {
+public enum AttendanceEnum {
 
     PRESENT(1, "P", "Presente"),
     MISS(2, "F", "Faltou"),
@@ -24,16 +24,16 @@ public enum AttendenceEnum {
 
     private final String description;
 
-    public static List<AttendenceEnum> getAllAttrbsSortedById() {
+    public static List<AttendanceEnum> getAllAttrbsSortedById() {
 
-        return Arrays.stream(AttendenceEnum.values())
+        return Arrays.stream(AttendanceEnum.values())
                 .collect(Collectors.toSet())
                 .stream()
-                .sorted(Comparator.comparing(AttendenceEnum::getId))
+                .sorted(Comparator.comparing(AttendanceEnum::getId))
                 .collect(Collectors.toList());
     }
 
-    public static AttendenceEnum fromId(Integer type) {
+    public static AttendanceEnum fromId(Integer type) {
         return Arrays.stream(values())
                 .filter(file -> Objects.equals(file.getId(), type))
                 .findFirst()

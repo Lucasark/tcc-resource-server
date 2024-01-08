@@ -12,10 +12,13 @@ import java.util.concurrent.ScheduledFuture;
 @Getter
 @Setter
 @Builder
-public class AttendenceHandler {
+public class AttendanceHandler {
 
     @NonNull
     private String courseId;
+
+    @NonNull
+    private String frequency;
 
     private String code;
 

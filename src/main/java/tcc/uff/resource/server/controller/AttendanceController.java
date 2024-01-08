@@ -16,17 +16,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import tcc.uff.resource.server.model.request.AttendencePatchRequest;
-import tcc.uff.resource.server.service.impl.AttendenceServiceImpl;
+import tcc.uff.resource.server.model.request.AttendancePatchRequest;
+import tcc.uff.resource.server.service.impl.AttendanceServiceImpl;
 
 @Slf4j
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/attendences")
-public class AttendenceController {
+@RequestMapping("/attendances")
+public class AttendanceController {
 
-    private final AttendenceServiceImpl attendenceService;
+    private final AttendanceServiceImpl attendanceService;
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PutMapping("/courses/{courseId}/codes/{code}")
@@ -36,7 +36,7 @@ public class AttendenceController {
                                 @PathVariable String courseId,
                                 @PathVariable String code
     ) {
-        attendenceService.updateFrequency(courseId, code, authentication.getName());
+        attendanceService.updateFrequency(courseId, code, authentication.getName());
         return ResponseEntity.ok().build();
     }
 
@@ -45,11 +45,11 @@ public class AttendenceController {
     @Operation(summary = "Atualizar a Presença de um Curso de um Membro")
     @PreAuthorize("@preAuthorize.isOwnerCourseByFrequency(authentication.name, #frequencyId)")
     public ResponseEntity<Void> updateAttedentceStatusByMember(Authentication authentication,
-                                                               @Valid @RequestBody AttendencePatchRequest attendencePatchRequest,
+                                                               @Valid @RequestBody AttendancePatchRequest attendancePatchRequest,
                                                                @PathVariable String frequencyId,
                                                                @PathVariable String memberId
     ) {
-        attendenceService.updateAttedentceStatusByMember(frequencyId, memberId, attendencePatchRequest.getStatus());
+        attendanceService.updateAttedentceStatusByMember(frequencyId, memberId, attendancePatchRequest.getStatus());
         return ResponseEntity.ok().build();
     }
 

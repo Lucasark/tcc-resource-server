@@ -4,8 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
-import tcc.uff.resource.server.converter.mongo.AttendenceEnumReadConverter;
-import tcc.uff.resource.server.converter.mongo.AttendenceEnumWriteConverter;
+import tcc.uff.resource.server.converter.mongo.AttendanceEnumReadConverter;
+import tcc.uff.resource.server.converter.mongo.AttendanceEnumWriteConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +41,8 @@ class MongoDBConfig {
     @Bean
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converterList = new ArrayList<>();
-        converterList.add(new AttendenceEnumReadConverter());
-        converterList.add(new AttendenceEnumWriteConverter());
+        converterList.add(new AttendanceEnumReadConverter());
+        converterList.add(new AttendanceEnumWriteConverter());
         return new MongoCustomConversions(converterList);
     }
 

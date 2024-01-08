@@ -2,35 +2,33 @@ package tcc.uff.resource.server.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tcc.uff.resource.server.model.document.Attendance;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
-import tcc.uff.resource.server.model.enums.AttendenceEnum;
-import tcc.uff.resource.server.model.handler.AttendenceHandler;
+import tcc.uff.resource.server.model.enums.AttendanceEnum;
+import tcc.uff.resource.server.model.handler.AttendanceHandler;
 import tcc.uff.resource.server.repository.FrequencyRepository;
 import tcc.uff.resource.server.repository.UserRepository;
-import tcc.uff.resource.server.service.AttendenceService;
+import tcc.uff.resource.server.service.AttendanceService;
 import tcc.uff.resource.server.service.mongooperations.MongoOperationsService;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AttendenceServiceImpl implements AttendenceService {
+public class AttendanceServiceImpl implements AttendanceService {
 
-    private final Map<String, AttendenceHandler> attendences;
+    private final Map<String, AttendanceHandler> attendances;
     private final FrequencyRepository frequencyRepository;
     private final UserRepository userRepository;
     private final MongoOperationsService mongoOperationsService;
 
     public void updateFrequency(String course, String code, String member) {
-        var attendenceHandler = attendences.get(course);
+        var attendanceHandler = attendances.get(course);
 
-        if (attendenceHandler.getCode().equals(code)) {
-            var frequency = frequencyRepository.findByDateAndCourseId(attendenceHandler.getDate(), course)
+        if (attendanceHandler.getCode().equals(code)) {
+            var frequency = frequencyRepository.findByDateAndCourseId(attendanceHandler.getDate(), course)
                     .orElseThrow(() -> new RuntimeException("Frequencia n existe!"));
 
             if (frequency.getAttendances().stream().anyMatch(a -> a.getStudent().getEmail().equals(member)))
@@ -40,7 +38,7 @@ public class AttendenceServiceImpl implements AttendenceService {
                     .orElseThrow(() -> new RuntimeException("N achou User!"));
 
             var a = Attendance.builder()
-                    .status(AttendenceEnum.PRESENT)
+                    .status(AttendanceEnum.PRESENT)
                     .student(user)
                     .build();
 
@@ -49,7 +47,7 @@ public class AttendenceServiceImpl implements AttendenceService {
     }
 
     public void updateAttedentceStatusByMember(String frequencyId, String memberId, Integer status) {
-        var toAttendance = AttendenceEnum.fromId(status);
+        var toAttendance = AttendanceEnum.fromId(status);
 
         var frequency = frequencyRepository.findById(frequencyId)
                 .orElseThrow(() -> new RuntimeException("N existe Frequencia"));

@@ -8,8 +8,8 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
-import tcc.uff.resource.server.handler.AttendenceWebSocketHandler;
-import tcc.uff.resource.server.model.handler.AttendenceHandler;
+import tcc.uff.resource.server.handler.AttendanceWebSocketHandler;
+import tcc.uff.resource.server.model.handler.AttendanceHandler;
 import tcc.uff.resource.server.service.CourseService;
 import tcc.uff.resource.server.service.impl.FrequencyServiceImpl;
 
@@ -21,7 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final Map<String, AttendenceHandler> attendences;
+    private final Map<String, AttendanceHandler> attendances;
 
     private final FrequencyServiceImpl frequencyService;
 
@@ -31,7 +31,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new AttendenceWebSocketHandler(taskScheduler, attendences, courseService, frequencyService), "/attendances/ws")
+        registry.addHandler(new AttendanceWebSocketHandler(taskScheduler, attendances, courseService, frequencyService), "/attendances/ws")
                 .setAllowedOriginPatterns("*");
     }
 }

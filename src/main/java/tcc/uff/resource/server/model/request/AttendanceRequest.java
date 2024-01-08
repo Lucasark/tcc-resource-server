@@ -13,7 +13,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendenceRequest {
+public class AttendanceRequest {
 
     @JsonSerialize(converter = Instant2StringConverter.class)
     private Instant date;

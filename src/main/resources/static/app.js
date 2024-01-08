@@ -12,17 +12,9 @@ function setConnected(connected) {
     $("#greetings").html("");
 }
 
-function setCookie(cname, cvalue, exdays) {
-    const d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    let expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
-
 function connect() {
 
     ws = new WebSocket("ws://localhost:8080/v1/api/attendances/ws?token="+$("#token").val());
-    // ws = new WebSocket("ws://localhost:8080/v1/api/attendences/ws");
 
     ws.onopen = function (e) {
         console.log("OPEN: ", e)

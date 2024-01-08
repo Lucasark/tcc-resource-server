@@ -17,8 +17,6 @@ import tcc.uff.resource.server.service.mongooperations.MongoOperationsService;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +53,12 @@ public class FrequencyServiceImpl {
                 .build();
     }
 
+    public void endFrenquecy(FrequencyDocument frequencyDocument) {
+        //TODO: Colocar faltas
+        frequencyDocument.setFinished(Boolean.TRUE);
+        frequencyRepository.save(frequencyDocument);
+    }
+
     public boolean isTeacherInFrequency(String teacher, String frequencyId) {
         var frequecy = frequencyRepository.findById(frequencyId)
                 .orElseThrow(() -> new RuntimeException("Frequencia n existe"));
@@ -64,11 +68,19 @@ public class FrequencyServiceImpl {
 
     public List<FrequencyDocument> allActivedFrequencyByCourse(String courseId) {
 
-//        var course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Curso n existe!"));
-//
-//        return frequencyRepository.findAllIdAndFinished(course.getFrequencies(), Boolean.TRUE);
+        var course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Curso n existe!"));
 
-        return Collections.emptyList();
+        return frequencyRepository.findByIdInAndFinished(course.getFrequencies(), Boolean.TRUE);
+
+    }
+
+    public FrequencyDocument getLastStartedFrequencyByCourse(String courseId) {
+
+        var course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Curso n existe!"));
+
+        var frequencies = frequencyRepository.findFirst1ByIdInAndFinishedOrderByDate(course.getFrequencies(), Boolean.FALSE);
+
+        return frequencies.isEmpty() ? FrequencyDocument.builder().build() : frequencies.get(0);
 
     }
 

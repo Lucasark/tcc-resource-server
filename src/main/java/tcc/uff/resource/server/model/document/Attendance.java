@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.DBRef;
-import tcc.uff.resource.server.model.enums.AttendenceEnum;
+import tcc.uff.resource.server.model.enums.AttendanceEnum;
 
 @Getter
 @Setter
@@ -15,6 +15,6 @@ public class Attendance {
     private UserDocument student;
 
     @Builder.Default
-    private AttendenceEnum status = AttendenceEnum.MISS;
+    private AttendanceEnum status = AttendanceEnum.MISS;
 
 }

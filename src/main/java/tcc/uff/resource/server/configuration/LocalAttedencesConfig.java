@@ -3,7 +3,7 @@ package tcc.uff.resource.server.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketSession;
-import tcc.uff.resource.server.model.handler.AttendenceHandler;
+import tcc.uff.resource.server.model.handler.AttendanceHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,11 +11,11 @@ import java.util.Map;
 @Configuration
 public class LocalAttedencesConfig {
 
-    private final Map<String, AttendenceHandler> attendences = new HashMap<>();
+    private final Map<String, AttendanceHandler> attendances = new HashMap<>();
 
-    @Bean("attendences")
-    public Map<String, AttendenceHandler> getAttendences() {
-        return attendences;
+    @Bean("attendances")
+    public Map<String, AttendanceHandler> getAttendances() {
+        return attendances;
     }
 
 
