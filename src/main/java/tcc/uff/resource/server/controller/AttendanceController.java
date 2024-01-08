@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import tcc.uff.resource.server.model.request.AttendencePatchRequest;
+import tcc.uff.resource.server.model.request.AttendancePatchRequest;
 import tcc.uff.resource.server.service.impl.AttendanceServiceImpl;
 
 @Slf4j
@@ -45,11 +45,11 @@ public class AttendanceController {
     @Operation(summary = "Atualizar a Presença de um Curso de um Membro")
     @PreAuthorize("@preAuthorize.isOwnerCourseByFrequency(authentication.name, #frequencyId)")
     public ResponseEntity<Void> updateAttedentceStatusByMember(Authentication authentication,
-                                                               @Valid @RequestBody AttendencePatchRequest attendencePatchRequest,
+                                                               @Valid @RequestBody AttendancePatchRequest attendancePatchRequest,
                                                                @PathVariable String frequencyId,
                                                                @PathVariable String memberId
     ) {
-        attendanceService.updateAttedentceStatusByMember(frequencyId, memberId, attendencePatchRequest.getStatus());
+        attendanceService.updateAttedentceStatusByMember(frequencyId, memberId, attendancePatchRequest.getStatus());
         return ResponseEntity.ok().build();
     }
 

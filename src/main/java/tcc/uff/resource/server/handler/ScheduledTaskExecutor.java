@@ -17,14 +17,16 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class ScheduledTaskExecutor implements Runnable {
 
-    private final AttendanceHandler attendence;
+    private final AttendanceHandler attendance;
 
     @Override
     public void run() {
         try {
             var code = GenerateString.generateRandomString(10);
-            attendence.setCode(code);
-            attendence.getSession().sendMessage(new TextMessage(code));
+            attendance.setCode(code);
+            if (attendance.getSession().isOpen()) {
+                attendance.getSession().sendMessage(new TextMessage(code));
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

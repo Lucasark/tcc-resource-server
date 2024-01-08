@@ -17,6 +17,9 @@ public class AttendanceHandler {
     @NonNull
     private String courseId;
 
+    @NonNull
+    private String frequency;
+
     private String code;
 
     @NonNull

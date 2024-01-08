@@ -53,6 +53,12 @@ public class FrequencyServiceImpl {
                 .build();
     }
 
+    public void endFrenquecy(FrequencyDocument frequencyDocument) {
+        //TODO: Colocar faltas
+        frequencyDocument.setFinished(Boolean.TRUE);
+        frequencyRepository.save(frequencyDocument);
+    }
+
     public boolean isTeacherInFrequency(String teacher, String frequencyId) {
         var frequecy = frequencyRepository.findById(frequencyId)
                 .orElseThrow(() -> new RuntimeException("Frequencia n existe"));
@@ -65,6 +71,16 @@ public class FrequencyServiceImpl {
         var course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Curso n existe!"));
 
         return frequencyRepository.findByIdInAndFinished(course.getFrequencies(), Boolean.TRUE);
+
+    }
+
+    public FrequencyDocument getLastStartedFrequencyByCourse(String courseId) {
+
+        var course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Curso n existe!"));
+
+        var frequencies = frequencyRepository.findFirst1ByIdInAndFinishedOrderByDate(course.getFrequencies(), Boolean.FALSE);
+
+        return frequencies.isEmpty() ? FrequencyDocument.builder().build() : frequencies.get(0);
 
     }
 

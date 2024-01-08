@@ -8,6 +8,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
+import tcc.uff.resource.server.model.document.FrequencyDocument;
 import tcc.uff.resource.server.model.enums.CommandWebSocketEnum;
 import tcc.uff.resource.server.model.handler.AttendanceHandler;
 import tcc.uff.resource.server.model.request.WebSocketStartRequest;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.socket.CloseStatus.POLICY_VIOLATION;
@@ -26,7 +28,7 @@ import static org.springframework.web.socket.CloseStatus.SERVER_ERROR;
 
 @Slf4j
 @RequiredArgsConstructor
-public class AttendenceWebSocketHandler extends AbstractWebSocketHandler {
+public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
 
     private final TaskScheduler taskScheduler;
 
@@ -39,6 +41,9 @@ public class AttendenceWebSocketHandler extends AbstractWebSocketHandler {
     private String courseId;
 
     private Instant date;
+
+    private String frequencyId;
+
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws IOException {
@@ -71,10 +76,10 @@ public class AttendenceWebSocketHandler extends AbstractWebSocketHandler {
 
             if (attendances.containsKey(courseId)) {
 
-                var oldAttendence = attendances.get(courseId);
+                var oldAttendance = attendances.get(courseId);
 
-                if (oldAttendence.getSession().isOpen()) {
-                    oldAttendence.getSession().close();
+                if (oldAttendance.getSession().isOpen()) {
+                    oldAttendance.getSession().close();
                 } else {
                     finisheSessionByCourseId(courseId);
                 }
@@ -83,7 +88,8 @@ public class AttendenceWebSocketHandler extends AbstractWebSocketHandler {
 
             var actived = frequencyService.allActivedFrequencyByCourse(courseId);
 
-            if (!actived.isEmpty()) {
+            if (actived.stream().anyMatch(auxFrequency -> auxFrequency.getDate().equals(date))) {
+
                 String result = actived.stream()
                         .map(v -> v.getDate().toString())
                         .collect(Collectors.joining(", "));
@@ -91,30 +97,42 @@ public class AttendenceWebSocketHandler extends AbstractWebSocketHandler {
                 var response = ErrorResponse.builder()
                         .message("Já existe uma Frequencia Ativa")
                         .description(result)
+                        .code("47")
                         .build();
 
                 session.close(POLICY_VIOLATION.withReason(new ObjectMapper().writeValueAsString(response)));
+                return;
             }
 
-//                Fluxo para criar uma nova
-            frequencyService.initFrenquency(courseId, date);
+            var frequency = frequencyService.getLastStartedFrequencyByCourse(courseId);
+            frequencyId = frequency.getId();
 
-            var attendence = AttendanceHandler.builder()
+            if (Optional.ofNullable(frequencyId).isPresent()) {
+                if (!frequency.getDate().equals(date)) {
+                    finisheFrequency(frequency);
+                    startFrequencyByCourseId();
+                }
+            } else {
+                startFrequencyByCourseId();
+            }
+
+            var attendance = AttendanceHandler.builder()
+                    .frequency(frequencyId)
                     .courseId(courseId)
                     .session(session)
                     .date(date)
                     .build();
 
-            attendances.put(courseId, attendence);
+            attendances.put(courseId, attendance);
 
-            var schedule = taskScheduler.scheduleAtFixedRate(new ScheduledTaskExecutor(attendence), Duration.ofSeconds(5));
+            var schedule = taskScheduler.scheduleAtFixedRate(new ScheduledTaskExecutor(attendance), Duration.ofSeconds(5));
 
             attendances.get(courseId).setScheduled(schedule);
         }
         if (CommandWebSocketEnum.STOP.equals(request.getType())) {
             finisheSessionByCourseId(courseId);
             session.close();
-            //TODO: Colocar faltar
+            finisheFrequency(frequencyService.getLastStartedFrequencyByCourse(courseId));
         }
     }
 
@@ -125,4 +143,12 @@ public class AttendenceWebSocketHandler extends AbstractWebSocketHandler {
         }
     }
 
+    private void startFrequencyByCourseId() {
+        var startedFrequency = frequencyService.initFrenquency(courseId, date);
+        frequencyId = startedFrequency.getId();
+    }
+
+    private void finisheFrequency(FrequencyDocument frequencyDocument) {
+        frequencyService.endFrenquecy(frequencyDocument);
+    }
 }

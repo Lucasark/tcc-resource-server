@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tcc.uff.resource.server.model.request.AttendenceRequest;
+import tcc.uff.resource.server.model.request.AttendanceRequest;
 import tcc.uff.resource.server.model.request.FrequencyQueryRequest;
 import tcc.uff.resource.server.model.response.FrequencyCreateResponse;
 import tcc.uff.resource.server.model.response.entity.FrequencyMapperResponse;
@@ -51,7 +51,7 @@ public class FrequencyController {
     @PostMapping("/courses/{courseId}")
     @Operation(summary = "Cria uma Chamada para um Curso com Validador Estatico")
     @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
-    public ResponseEntity<FrequencyCreateResponse> createAttendence(@Valid @RequestBody AttendenceRequest request,
+    public ResponseEntity<FrequencyCreateResponse> createAttendance(@Valid @RequestBody AttendanceRequest request,
                                                                     @PathVariable String courseId
     ) {
         return ResponseEntity.ok(frequencyService.initFrenquency(courseId, request.getDate()));
