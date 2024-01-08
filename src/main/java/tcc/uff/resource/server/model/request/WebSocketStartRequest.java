@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tcc.uff.resource.server.model.enums.CommandWebSocketEnum;
+
+import java.time.Instant;
 
 @Data
 @Builder
@@ -13,9 +16,8 @@ public class WebSocketStartRequest {
 
     private String courseId;
 
-    //TODO: Mudar para um formato!
-    private String date;
+    private Instant date;
 
-    private String type;
+    private CommandWebSocketEnum type;
 
 }

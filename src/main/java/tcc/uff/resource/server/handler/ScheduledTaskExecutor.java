@@ -3,7 +3,7 @@ package tcc.uff.resource.server.handler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.TextMessage;
-import tcc.uff.resource.server.model.handler.AttendenceHandler;
+import tcc.uff.resource.server.model.handler.AttendanceHandler;
 import tcc.uff.resource.server.utils.GenerateString;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class ScheduledTaskExecutor implements Runnable {
 
-    private final AttendenceHandler attendence;
+    private final AttendanceHandler attendence;
 
     @Override
     public void run() {

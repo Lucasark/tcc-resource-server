@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,7 @@ public interface FrequencyRepository extends MongoRepository<FrequencyDocument, 
 
     Optional<FrequencyDocument> findByDateAndCourseId(Instant date, String courseId);
     List<FrequencyDocument> findByDateBetweenAndCourseId(Instant start, Instant end, String courseId);
-//    List<FrequencyDocument> findAllByIdAndFinished(String id, Boolean finished);
+    List<FrequencyDocument> findByIdInAndFinished(Collection<String> id, Boolean finished);
 //
 //    List<FrequencyDocument> findBy(String id);
 

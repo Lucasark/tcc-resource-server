@@ -17,8 +17,6 @@ import tcc.uff.resource.server.service.mongooperations.MongoOperationsService;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,11 +62,9 @@ public class FrequencyServiceImpl {
 
     public List<FrequencyDocument> allActivedFrequencyByCourse(String courseId) {
 
-//        var course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Curso n existe!"));
-//
-//        return frequencyRepository.findAllIdAndFinished(course.getFrequencies(), Boolean.TRUE);
+        var course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Curso n existe!"));
 
-        return Collections.emptyList();
+        return frequencyRepository.findByIdInAndFinished(course.getFrequencies(), Boolean.TRUE);
 
     }
 
