@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tcc.uff.resource.server.exceptions.TempException;
+import tcc.uff.resource.server.model.document.Attendance;
 import tcc.uff.resource.server.model.document.CourseDocument;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
 import tcc.uff.resource.server.model.document.UserAlias;
@@ -16,10 +17,13 @@ import tcc.uff.resource.server.repository.FrequencyRepository;
 import tcc.uff.resource.server.service.mongooperations.MongoOperationsService;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.stream.Collectors.toMap;
 
 @Slf4j
 @Service
@@ -32,9 +36,9 @@ public class FrequencyServiceImpl {
 
     private final MongoOperationsService mongoOperationsService;
 
-    public FrequencyCreateResponse initFrenquency(String course, Instant date) throws RuntimeException {
+    public FrequencyCreateResponse initFrenquency(String courseId, Instant date) throws RuntimeException {
 
-        var courseDocument = courseRepository.findById(course)
+        var courseDocument = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("N achou Classe!"));
 
         var frequencyNew = FrequencyDocument.builder()
@@ -44,7 +48,7 @@ public class FrequencyServiceImpl {
 
         frequencyRepository.save(frequencyNew);
 
-        mongoOperationsService.addInSet("id", course, "frequencies", frequencyNew.getId(), CourseDocument.class);
+        mongoOperationsService.addInSet("id", courseId, "frequencies", frequencyNew.getId(), CourseDocument.class);
 
         return FrequencyCreateResponse.builder()
                 .id(frequencyNew.getId())
@@ -54,9 +58,24 @@ public class FrequencyServiceImpl {
     }
 
     public void endFrenquecy(FrequencyDocument frequencyDocument) {
-        //TODO: Colocar faltas
         frequencyDocument.setFinished(Boolean.TRUE);
+        frequencyDocument.setFinishedAt(LocalDateTime.now());
         frequencyRepository.save(frequencyDocument);
+
+        var attendances = frequencyDocument.getAttendances().stream().collect(toMap(a -> a.getStudent().getEmail(), Attendance::getStudent));
+
+        frequencyDocument.getCourse().getMembers().forEach(member -> {
+            if (!attendances.containsKey(member.getEmail())) {
+                mongoOperationsService.addInSet("id", frequencyDocument.getId(), "attendances", Attendance.builder().student(member).build(), FrequencyDocument.class);
+            }
+        });
+    }
+
+    public void endFrenquecy(String frequencyId) {
+        frequencyRepository.findById(frequencyId).ifPresentOrElse(this::endFrenquecy,
+                () -> {
+                    throw new RuntimeException("N achou Frenquencia!");
+                });
     }
 
     public boolean isTeacherInFrequency(String teacher, String frequencyId) {
@@ -66,7 +85,7 @@ public class FrequencyServiceImpl {
         return frequecy.getCourse().getTeacher().getEmail().equals(teacher);
     }
 
-    public List<FrequencyDocument> allActivedFrequencyByCourse(String courseId) {
+    public List<FrequencyDocument> allFinishedFrequencyByCourse(String courseId) {
 
         var course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Curso n existe!"));
 

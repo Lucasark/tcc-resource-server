@@ -13,6 +13,7 @@ import tcc.uff.resource.server.model.enums.CommandWebSocketEnum;
 import tcc.uff.resource.server.model.handler.AttendanceHandler;
 import tcc.uff.resource.server.model.request.WebSocketStartRequest;
 import tcc.uff.resource.server.model.response.ErrorResponse;
+import tcc.uff.resource.server.service.AttendanceService;
 import tcc.uff.resource.server.service.CourseService;
 import tcc.uff.resource.server.service.impl.FrequencyServiceImpl;
 
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.springframework.web.socket.CloseStatus.BAD_DATA;
 import static org.springframework.web.socket.CloseStatus.POLICY_VIOLATION;
 import static org.springframework.web.socket.CloseStatus.SERVER_ERROR;
 
@@ -37,6 +39,8 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
     private final CourseService courseService;
 
     private final FrequencyServiceImpl frequencyService;
+
+    private final AttendanceService attendanceService;
 
     private String courseId;
 
@@ -58,6 +62,16 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
             date = request.getDate();
         } catch (Exception e) {
             log.error("GENERICO!", e);
+
+            var response = ErrorResponse.builder()
+                    .message("Falha no Payload")
+                    .description(e.getMessage())
+                    .code(String.valueOf(BAD_DATA.getCode()))
+                    .build();
+
+            session.close(BAD_DATA.withReason(new ObjectMapper().writeValueAsString(response)));
+
+            return;
         }
 
         if (CommandWebSocketEnum.START.equals(request.getType())) {
@@ -86,16 +100,16 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
 
             }
 
-            var actived = frequencyService.allActivedFrequencyByCourse(courseId);
+            var finished = frequencyService.allFinishedFrequencyByCourse(courseId);
 
-            if (actived.stream().anyMatch(auxFrequency -> auxFrequency.getDate().equals(date))) {
+            if (finished.stream().anyMatch(auxFrequency -> auxFrequency.getDate().equals(date))) {
 
-                String result = actived.stream()
+                String result = finished.stream()
                         .map(v -> v.getDate().toString())
                         .collect(Collectors.joining(", "));
 
                 var response = ErrorResponse.builder()
-                        .message("Já existe uma Frequencia Ativa")
+                        .message("Já existe uma Frequencia Ativa para este Curso")
                         .description(result)
                         .code("47")
                         .build();
@@ -103,6 +117,9 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
                 session.close(POLICY_VIOLATION.withReason(new ObjectMapper().writeValueAsString(response)));
                 return;
             }
+
+            //TODO: Talvez de ruim... será que é possivel ter mais de uma frequencia ativa?
+            //Caso sim, finaliza todas, ou apenas a ultima?
 
             var frequency = frequencyService.getLastStartedFrequencyByCourse(courseId);
             frequencyId = frequency.getId();
@@ -125,7 +142,7 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
 
             attendances.put(courseId, attendance);
 
-            var schedule = taskScheduler.scheduleAtFixedRate(new ScheduledTaskExecutor(attendance), Duration.ofSeconds(5));
+            var schedule = taskScheduler.scheduleAtFixedRate(new ScheduledTaskExecutor(attendance, attendanceService), Duration.ofSeconds(5));
 
             attendances.get(courseId).setScheduled(schedule);
         }
