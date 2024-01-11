@@ -21,6 +21,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     private final Map<String, AttendanceHandler> attendances;
     private final FrequencyRepository frequencyRepository;
+    private final FrequencyServiceImpl frequencyService;
     private final UserRepository userRepository;
     private final MongoOperationsService mongoOperationsService;
 
@@ -67,5 +68,13 @@ public class AttendanceServiceImpl implements AttendanceService {
                         .build(),
                 FrequencyDocument.class
         );
+    }
+
+    @Override
+    public void removeAttendanceByCourseId(String courseId) {
+        var attendence = attendances.get(courseId);
+        frequencyService.endFrenquecy(attendence.getFrequency());
+        attendence.getScheduled().cancel(true);
+        attendances.remove(courseId);
     }
 }
