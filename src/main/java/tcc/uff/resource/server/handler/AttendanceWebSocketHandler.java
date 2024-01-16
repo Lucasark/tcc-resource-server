@@ -32,6 +32,8 @@ import static org.springframework.web.socket.CloseStatus.SERVER_ERROR;
 @RequiredArgsConstructor
 public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
 
+    private static final int DURATION_TIME_SECONDS = 30;
+
     private final TaskScheduler taskScheduler;
 
     private final Map<String, AttendanceHandler> attendances;
@@ -142,7 +144,7 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
 
             attendances.put(courseId, attendance);
 
-            var schedule = taskScheduler.scheduleAtFixedRate(new ScheduledTaskExecutor(attendance, attendanceService), Duration.ofSeconds(5));
+            var schedule = taskScheduler.scheduleAtFixedRate(new ScheduledTaskExecutor(attendance, attendanceService), Duration.ofSeconds(DURATION_TIME_SECONDS));
 
             attendances.get(courseId).setScheduled(schedule);
         }
