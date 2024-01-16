@@ -21,7 +21,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class ScheduledTaskExecutor implements Runnable {
 
-    private static final Integer MAX_REPEAT = 3;
+    private static final Integer MAX_REPEAT = 120;
 
     private final AttendanceHandler attendance;
 
