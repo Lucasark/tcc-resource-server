@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tcc.uff.resource.server.model.request.AttendancePatchRequest;
+import tcc.uff.resource.server.model.response.AttendanceActivedResponse;
 import tcc.uff.resource.server.service.impl.AttendanceServiceImpl;
 
 @Slf4j
@@ -52,5 +54,13 @@ public class AttendanceController {
         attendanceService.updateAttedentceStatusByMember(frequencyId, memberId, attendancePatchRequest.getStatus());
         return ResponseEntity.ok().build();
     }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @GetMapping("/courses/{courseId}/actived")
+    @Operation(summary = "Valida se existe uma chamada em Andamento")
+    public ResponseEntity<AttendanceActivedResponse> frequencyIsActived(@PathVariable String courseId) {
+        return ResponseEntity.ok(attendanceService.isActived(courseId));
+    }
+
 
 }
