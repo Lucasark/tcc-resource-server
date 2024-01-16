@@ -34,7 +34,7 @@ public class FrequencyController {
     @GetMapping("/courses/{courseId}/owner")
     @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
     public ResponseEntity<List<FrequencyMapperResponse>> getQueryFrequency(Authentication authentication,
-                                                                           FrequencyQueryRequest frequencyQueryRequest,
+                                                                           @Valid FrequencyQueryRequest frequencyQueryRequest,
                                                                            @PathVariable String courseId
     ) {
         return ResponseEntity.ok(frequencyService.getFrequencies(courseId, frequencyQueryRequest.getStart(), frequencyQueryRequest.getEnd()));
