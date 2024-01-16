@@ -20,6 +20,7 @@ public class CourseResponseConverter {
 
         var response = this.mapper.map(document, CourseResponse.class);
         response.setOwner(document.getTeacher().getEmail());
+        response.setTeacher(document.getTeacher().getName());
         response.getMembers().clear();
 
         document.getMembers().forEach(memberDocument -> {

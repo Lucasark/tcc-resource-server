@@ -57,5 +57,4 @@ public class FrequencyController {
         return ResponseEntity.ok(frequencyService.initFrenquency(courseId, request.getDate()));
     }
 
-
 }

@@ -28,6 +28,8 @@ public class CourseResponse {
 
     private String owner;
 
+    private String teacher;
+
     @Builder.Default
     private Set<UserResponse> members = new HashSet<>();
 

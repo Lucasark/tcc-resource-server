@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import tcc.uff.resource.server.model.document.Attendance;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
 import tcc.uff.resource.server.model.enums.AttendanceEnum;
+import tcc.uff.resource.server.model.enums.AttendanceStatusEnum;
 import tcc.uff.resource.server.model.handler.AttendanceHandler;
+import tcc.uff.resource.server.model.response.AttendanceActivedResponse;
 import tcc.uff.resource.server.repository.FrequencyRepository;
 import tcc.uff.resource.server.repository.UserRepository;
 import tcc.uff.resource.server.service.AttendanceService;
@@ -45,6 +47,13 @@ public class AttendanceServiceImpl implements AttendanceService {
 
             mongoOperationsService.addInSet("id", frequency.getId(), "attendances", a, FrequencyDocument.class);
         }
+    }
+
+    public AttendanceActivedResponse isActived(String courseId) {
+        if (attendances.containsKey(courseId)) {
+            return AttendanceActivedResponse.builder().status(AttendanceStatusEnum.STARTED).build();
+        }
+        return AttendanceActivedResponse.builder().status(AttendanceStatusEnum.NOT_STARTED).build();
     }
 
     public void updateAttedentceStatusByMember(String frequencyId, String memberId, Integer status) {
