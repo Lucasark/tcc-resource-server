@@ -23,16 +23,16 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class ScheduledTaskExecutor implements Runnable {
 
-    private static final Integer MAX_REPEAT = 120;
 
     private final AttendanceHandler attendance;
 
     private final AttendanceService attendanceService;
 
+    private final int maxRepeat;
 
     @Override
     public void run() {
-        if (!attendance.getRepeat().equals(MAX_REPEAT)) {
+        if (!attendance.getRepeat().equals(maxRepeat)) {
             try {
                 var code = GenerateString.generateRandomString(10);
                 attendance.setCode(code);
