@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum CommandWebSocketEnum {
+public enum CommandRequestWebSocketEnum {
 
     START,
     STOP

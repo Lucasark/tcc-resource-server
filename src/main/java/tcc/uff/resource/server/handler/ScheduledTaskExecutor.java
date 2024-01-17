@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
+import tcc.uff.resource.server.model.enums.CommandResponseWebSocketEnum;
 import tcc.uff.resource.server.model.handler.AttendanceHandler;
+import tcc.uff.resource.server.model.request.WebSocketResponse;
 import tcc.uff.resource.server.model.response.ErrorResponse;
 import tcc.uff.resource.server.service.AttendanceService;
 import tcc.uff.resource.server.utils.GenerateString;
@@ -36,7 +38,14 @@ public class ScheduledTaskExecutor implements Runnable {
                 attendance.setCode(code);
                 if (attendance.getSession().isOpen()) {
                     log.info("ENVIADO MSG: " + attendance.getCourseId() + " | " + attendance.getDate());
-                    attendance.getSession().sendMessage(new TextMessage(code));
+
+                    var response = WebSocketResponse.builder()
+                            .type(CommandResponseWebSocketEnum.CODE)
+                            .description("Código para ativação")
+                            .value(code)
+                            .build();
+
+                    attendance.getSession().sendMessage(new TextMessage(new ObjectMapper().writeValueAsString(response)));
                 } else {
                     log.warn("NÃO ENVIOU MSG! MAS AINDA ESTÁ ATIVO: " + attendance.getCourseId() + " | " + attendance.getDate());
                 }

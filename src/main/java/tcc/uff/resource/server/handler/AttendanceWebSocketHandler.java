@@ -5,13 +5,16 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
-import tcc.uff.resource.server.model.enums.CommandWebSocketEnum;
+import tcc.uff.resource.server.model.enums.CommandRequestWebSocketEnum;
+import tcc.uff.resource.server.model.enums.CommandResponseWebSocketEnum;
 import tcc.uff.resource.server.model.handler.AttendanceHandler;
-import tcc.uff.resource.server.model.request.WebSocketStartRequest;
+import tcc.uff.resource.server.model.request.WebSocketRequest;
+import tcc.uff.resource.server.model.request.WebSocketResponse;
 import tcc.uff.resource.server.model.response.ErrorResponse;
 import tcc.uff.resource.server.service.AttendanceService;
 import tcc.uff.resource.server.service.CourseService;
@@ -21,8 +24,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.springframework.web.socket.CloseStatus.BAD_DATA;
 import static org.springframework.web.socket.CloseStatus.POLICY_VIOLATION;
@@ -56,10 +57,10 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
 
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-        WebSocketStartRequest request = new WebSocketStartRequest();
+        WebSocketRequest request;
 
         try {
-            request = objectMapper.readValue(message.getPayload().toString(), WebSocketStartRequest.class);
+            request = objectMapper.readValue(message.getPayload().toString(), WebSocketRequest.class);
             courseId = request.getCourseId();
             date = request.getDate();
         } catch (Exception e) {
@@ -76,7 +77,7 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
             return;
         }
 
-        if (CommandWebSocketEnum.START.equals(request.getType())) {
+        if (CommandRequestWebSocketEnum.START.equals(request.getType())) {
             var principal = session.getPrincipal();
 
             if (principal == null || principal.getName() == null) {
@@ -90,57 +91,40 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
                 return;
             }
 
-            if (attendances.containsKey(courseId)) {
-
-                var oldAttendance = attendances.get(courseId);
-
-                if (oldAttendance.getSession().isOpen()) {
-                    oldAttendance.getSession().close();
-                } else {
-                    finisheSessionByCourseId(courseId);
-                }
-
-            }
-
-            var finished = frequencyService.allFinishedFrequencyByCourse(courseId);
-
-            if (finished.stream().anyMatch(auxFrequency -> auxFrequency.getDate().equals(date))) {
-
-                String result = finished.stream()
-                        .map(v -> v.getDate().toString())
-                        .collect(Collectors.joining(", "));
-
-                var response = ErrorResponse.builder()
-                        .message("Já existe uma Frequencia Ativa para este Curso")
-                        .description(result)
-                        .code("47")
-                        .build();
-
-                session.close(POLICY_VIOLATION.withReason(new ObjectMapper().writeValueAsString(response)));
-                return;
-            }
-
-            //TODO: Talvez de ruim... será que é possivel ter mais de uma frequencia ativa?
-            //Caso sim, finaliza todas, ou apenas a ultima?
-
-            var frequency = frequencyService.getLastStartedFrequencyByCourse(courseId);
-            frequencyId = frequency.getId();
-
-            if (Optional.ofNullable(frequencyId).isPresent()) {
-                if (!frequency.getDate().equals(date)) {
-                    finisheFrequency(frequency);
-                    startFrequencyByCourseId();
-                }
-            } else {
-                startFrequencyByCourseId();
-            }
-
             var attendance = AttendanceHandler.builder()
-                    .frequency(frequencyId)
                     .courseId(courseId)
                     .session(session)
                     .date(date)
                     .build();
+
+            var frequencyOptional = frequencyService.getFrequencyByCourseAndDate(courseId, date);
+
+            if (frequencyOptional.isPresent()) {
+                if (Boolean.TRUE.equals(frequencyOptional.get().getFinished())) {
+                    var response = ErrorResponse.builder()
+                            .message("Existe uma Frequencia Finalizada para este Curso nesta Data!")
+                            .description(frequencyOptional.get().getDate().toString())
+                            .code("47")
+                            .build();
+
+                    session.close(POLICY_VIOLATION.withReason(new ObjectMapper().writeValueAsString(response)));
+                    return;
+                } else {
+
+                    var response = WebSocketResponse.builder()
+                            .type(CommandResponseWebSocketEnum.WARN)
+                            .value("Existe uma Frequencia criada para este Curso nesta Data!")
+                            .description("A frequencia será retomada para está data deste curso")
+                            .build();
+
+                    session.sendMessage(new TextMessage(new ObjectMapper().writeValueAsString(response)));
+
+                    finisheSessionByCourseId(courseId);
+                }
+            } else {
+                frequencyService.endLastFrequencyOfCourse(courseId);
+                startFrequencyByCourseId();
+            }
 
             attendances.put(courseId, attendance);
 
@@ -148,16 +132,16 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
 
             attendances.get(courseId).setScheduled(schedule);
         }
-        if (CommandWebSocketEnum.STOP.equals(request.getType())) {
+        if (CommandRequestWebSocketEnum.STOP.equals(request.getType())) {
             finisheSessionByCourseId(courseId);
             session.close();
-            finisheFrequency(frequencyService.getLastStartedFrequencyByCourse(courseId));
+            frequencyService.getLastStartedFrequencyByCourse(courseId).ifPresent(this::finisheFrequency);
         }
     }
 
     private void finisheSessionByCourseId(String courseId) {
         if (attendances.containsKey(courseId)) {
-            attendances.get(courseId).getScheduled().cancel(false);
+            attendances.get(courseId).getScheduled().cancel(true);
             attendances.remove(courseId);
         }
     }
@@ -168,6 +152,6 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
     }
 
     private void finisheFrequency(FrequencyDocument frequencyDocument) {
-        frequencyService.endFrenquecy(frequencyDocument);
+        frequencyService.endFrenquecyByCourse(frequencyDocument);
     }
 }

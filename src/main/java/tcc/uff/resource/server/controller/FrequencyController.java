@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -32,15 +33,17 @@ public class FrequencyController {
     private final FrequencyServiceImpl frequencyService;
 
     @GetMapping("/courses/{courseId}/owner")
+    @Operation(summary = "Frequencia de todo um curso pela data")
     @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
     public ResponseEntity<List<FrequencyMapperResponse>> getQueryFrequency(Authentication authentication,
-                                                                           @Valid FrequencyQueryRequest frequencyQueryRequest,
+                                                                           @ParameterObject @Valid FrequencyQueryRequest frequencyQueryRequest,
                                                                            @PathVariable String courseId
     ) {
         return ResponseEntity.ok(frequencyService.getFrequencies(courseId, frequencyQueryRequest.getStart(), frequencyQueryRequest.getEnd()));
     }
 
     @GetMapping("/courses/{courseId}/member")
+    @Operation(summary = "Frequencia de membro de um curso")
     @PreAuthorize("@preAuthorize.isMemberCourse(authentication.name, #courseId)")
     public Object getMemberFrequency(Authentication authentication,
                                      @PathVariable String courseId) {
@@ -56,5 +59,7 @@ public class FrequencyController {
     ) {
         return ResponseEntity.ok(frequencyService.initFrenquency(courseId, request.getDate()));
     }
+
+    //PLANILHA DE FREQUENCIA!
 
 }
