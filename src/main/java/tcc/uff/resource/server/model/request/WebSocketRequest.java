@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tcc.uff.resource.server.model.enums.CommandWebSocketEnum;
+import tcc.uff.resource.server.model.enums.CommandRequestWebSocketEnum;
 
 import java.time.Instant;
 
@@ -12,12 +12,12 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WebSocketStartRequest {
+public class WebSocketRequest {
 
     private String courseId;
 
     private Instant date;
 
-    private CommandWebSocketEnum type;
+    private CommandRequestWebSocketEnum type;
 
 }

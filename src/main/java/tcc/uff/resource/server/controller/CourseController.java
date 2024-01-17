@@ -104,6 +104,7 @@ public class CourseController {
                                                          @RequestBody @Valid UserAddInBatchRequest userAddInBatchRequest,
                                                          @PathVariable String courseId
     ) {
+        //TODO: BATCH!
 //        return ResponseEntity.ok(courseService.includeMember(courseId, memberId));
         return null;
     }

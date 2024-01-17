@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -57,7 +58,7 @@ public class FrequencyServiceImpl {
                 .build();
     }
 
-    public void endFrenquecy(FrequencyDocument frequencyDocument) {
+    public void endFrenquecyByCourse(FrequencyDocument frequencyDocument) {
         frequencyDocument.setFinished(Boolean.TRUE);
         frequencyDocument.setFinishedAt(LocalDateTime.now());
         frequencyRepository.save(frequencyDocument);
@@ -71,11 +72,8 @@ public class FrequencyServiceImpl {
         });
     }
 
-    public void endFrenquecy(String frequencyId) {
-        frequencyRepository.findById(frequencyId).ifPresentOrElse(this::endFrenquecy,
-                () -> {
-                    throw new RuntimeException("N achou Frenquencia!");
-                });
+    public void endLastFrequencyOfCourse(String courseId) {
+        getLastStartedFrequencyByCourse(courseId).ifPresent(this::endFrenquecyByCourse);
     }
 
     public boolean isTeacherInFrequency(String teacher, String frequencyId) {
@@ -93,13 +91,19 @@ public class FrequencyServiceImpl {
 
     }
 
-    public FrequencyDocument getLastStartedFrequencyByCourse(String courseId) {
+    public Optional<FrequencyDocument> getFrequencyByCourseAndDate(String courseId, Instant date) {
+
+        return frequencyRepository.findByCourseIdAndDate(courseId, date);
+
+    }
+
+    public Optional<FrequencyDocument> getLastStartedFrequencyByCourse(String courseId) {
 
         var course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Curso n existe!"));
 
         var frequencies = frequencyRepository.findFirst1ByIdInAndFinishedOrderByDate(course.getFrequencies(), Boolean.FALSE);
 
-        return frequencies.isEmpty() ? FrequencyDocument.builder().build() : frequencies.get(0);
+        return frequencies.isEmpty() ? Optional.empty() : Optional.of(frequencies.get(0));
 
     }
 
