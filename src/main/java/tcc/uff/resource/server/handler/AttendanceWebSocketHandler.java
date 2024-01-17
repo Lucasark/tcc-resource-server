@@ -2,6 +2,7 @@ package tcc.uff.resource.server.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.TaskScheduler;
@@ -33,8 +34,6 @@ import static org.springframework.web.socket.CloseStatus.SERVER_ERROR;
 @RequiredArgsConstructor
 public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
 
-    private static final int DURATION_TIME_SECONDS = 30;
-
     private final TaskScheduler taskScheduler;
 
     private final Map<String, AttendanceHandler> attendances;
@@ -45,19 +44,20 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
 
     private final AttendanceService attendanceService;
 
-    private String courseId;
+    private final Integer durationTimeSeconds;
 
-    private Instant date;
-
-    private String frequencyId;
-
+    private final Integer maxLimitSender;
 
     @Override
-    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws IOException {
+    public void handleMessage(@NonNull WebSocketSession session, @NonNull WebSocketMessage<?> message) throws IOException {
 
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
         WebSocketRequest request;
+
+        String courseId;
+
+        Instant date;
 
         try {
             request = objectMapper.readValue(message.getPayload().toString(), WebSocketRequest.class);
@@ -123,12 +123,12 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
                 }
             } else {
                 frequencyService.endLastFrequencyOfCourse(courseId);
-                startFrequencyByCourseId();
+                frequencyService.initFrenquency(courseId, date);
             }
 
             attendances.put(courseId, attendance);
 
-            var schedule = taskScheduler.scheduleAtFixedRate(new ScheduledTaskExecutor(attendance, attendanceService), Duration.ofSeconds(DURATION_TIME_SECONDS));
+            var schedule = taskScheduler.scheduleAtFixedRate(new ScheduledTaskExecutor(attendance, attendanceService, maxLimitSender), Duration.ofSeconds(durationTimeSeconds));
 
             attendances.get(courseId).setScheduled(schedule);
         }
@@ -144,11 +144,6 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
             attendances.get(courseId).getScheduled().cancel(true);
             attendances.remove(courseId);
         }
-    }
-
-    private void startFrequencyByCourseId() {
-        var startedFrequency = frequencyService.initFrenquency(courseId, date);
-        frequencyId = startedFrequency.getId();
     }
 
     private void finisheFrequency(FrequencyDocument frequencyDocument) {

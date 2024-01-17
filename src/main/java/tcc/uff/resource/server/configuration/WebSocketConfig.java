@@ -3,6 +3,7 @@ package tcc.uff.resource.server.configuration;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -32,9 +33,23 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final AttendanceService attendanceService;
 
+    @Value("${properties.system.duration-time-seconds}")
+    private Integer durationTimeSeconds;
+
+    @Value("${properties.system.max-limit-sender}")
+    private Integer maxLimitSender;
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new AttendanceWebSocketHandler(taskScheduler, attendances, courseService, frequencyService, attendanceService), "/attendances/ws")
+        registry.addHandler(new AttendanceWebSocketHandler(
+                        taskScheduler,
+                        attendances,
+                        courseService,
+                        frequencyService,
+                        attendanceService,
+                        durationTimeSeconds,
+                        maxLimitSender
+                ), "/attendances/ws")
                 .setAllowedOriginPatterns("*");
     }
 }
