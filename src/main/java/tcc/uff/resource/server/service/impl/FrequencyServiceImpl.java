@@ -9,6 +9,7 @@ import tcc.uff.resource.server.model.document.CourseDocument;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
 import tcc.uff.resource.server.model.document.UserAlias;
 import tcc.uff.resource.server.model.document.UserDocument;
+import tcc.uff.resource.server.model.enums.AttendanceEnum;
 import tcc.uff.resource.server.model.response.FrequencyCreateResponse;
 import tcc.uff.resource.server.model.response.entity.FrequencyMapperResponse;
 import tcc.uff.resource.server.model.response.entity.FrequencyResponse;
@@ -20,9 +21,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -42,8 +45,17 @@ public class FrequencyServiceImpl {
         var courseDocument = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("N achou Classe!"));
 
+        Set<Attendance> attendances = new HashSet<>();
+
+        courseDocument.getMembers().forEach(member ->
+                attendances.add(Attendance.builder()
+                        .student(member)
+                        .build())
+        );
+
         var frequencyNew = FrequencyDocument.builder()
                 .course(courseDocument)
+                .attendances(attendances)
                 .date(date)
                 .build();
 
@@ -153,5 +165,73 @@ public class FrequencyServiceImpl {
         );
 
         return new ArrayList<>(mapResponse.values());
+    }
+
+    public List<FrequencyMapperResponse> getAllFrequencies(String courseId) {
+        var course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new TempException("Curso n encontrado!"));
+
+        Map<String, FrequencyMapperResponse> mapResponse = new HashMap<>();
+
+        for (UserDocument userDocument : course.getMembers()) {
+            var value = FrequencyMapperResponse.builder().id(userDocument.getEmail());
+
+            var alias = userDocument.getAliases().stream()
+                    .filter(userAlias -> userAlias.getCourseId().equals(courseId))
+                    .map(UserAlias::getName)
+                    .findFirst()
+                    .orElse("S/A");
+
+            value.alias(alias);
+
+            mapResponse.put(userDocument.getEmail(), value.build());
+        }
+
+        //TODO: Pelo Pai, Do Filho e Do Espirito Santo...On^3 tranformar em Mapperes
+
+        frequencyRepository.findAllByCourseId(courseId).forEach(frequencyDocument -> {
+                    frequencyDocument.getAttendances().forEach(attendance -> {
+                                mapResponse.get(attendance.getStudent().getEmail()).getFrequencies()
+                                        .add(FrequencyResponse.builder()
+                                                .id(frequencyDocument.getId())
+                                                .date(frequencyDocument.getDate())
+                                                .status(attendance.getStatus().getId())
+                                                .build());
+                            }
+                    );
+                }
+        );
+
+        return new ArrayList<>(mapResponse.values());
+    }
+
+    public List<FrequencyResponse> getAllFrequenciesOfMember(String courseId, String memberId) {
+        var frequecies = frequencyRepository.findAllByCourseId(courseId);
+
+        List<FrequencyResponse> frequencyResponses = new ArrayList<>();
+
+        frequecies.forEach(frequency ->
+                frequency.getAttendances().stream()
+                        .filter(attendance -> attendance.getStudent().getEmail().equals(memberId))
+                        .findFirst().ifPresentOrElse(
+                                attendance -> frequencyResponses.add(
+                                        FrequencyResponse.builder()
+                                                .id(frequency.getId())
+                                                .date(frequency.getDate())
+                                                .status(attendance.getStatus().getId())
+                                                .build()
+                                ),
+                                () -> frequencyResponses.add(
+                                        FrequencyResponse.builder()
+                                                .id(frequency.getId())
+                                                .date(frequency.getDate())
+                                                .status(AttendanceEnum.UNDEFINED.getId())
+                                                .build()
+                                )
+                        )
+        );
+
+        return frequencyResponses;
+
     }
 }

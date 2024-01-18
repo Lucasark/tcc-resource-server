@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import tcc.uff.resource.server.model.request.CourseRequest;
 import tcc.uff.resource.server.model.request.UserAddInBatchRequest;
 import tcc.uff.resource.server.model.request.UserAddRequest;
+import tcc.uff.resource.server.model.response.CourseBatchMemberResponse;
 import tcc.uff.resource.server.model.response.entity.CourseResponse;
 import tcc.uff.resource.server.service.CourseService;
 
@@ -97,15 +98,13 @@ public class CourseController {
         return ResponseEntity.ok(courseService.addMember(courseId, userAddRequest.getEmail(), userAddRequest.getAlias(), userAddRequest.getRegistration()));
     }
 
-    @PatchMapping("/{courseId}/member/batch")
-    @Operation(summary = "(W.I.P) - Adicionar pacote de membros ao Curso - Obrigatorio ser o Dono - (W.I.P)")
+    @PatchMapping("/{courseId}/member-batch")
+    @Operation(summary = "Adicionar pacote de membros ao Curso - Obrigatorio ser o Dono ")
     @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
-    public ResponseEntity<CourseResponse> addBatchMember(Authentication authentication,
-                                                         @RequestBody @Valid UserAddInBatchRequest userAddInBatchRequest,
-                                                         @PathVariable String courseId
+    public ResponseEntity<CourseBatchMemberResponse> addBatchMember(Authentication authentication,
+                                                                    @RequestBody @Valid UserAddInBatchRequest userAddInBatchRequest,
+                                                                    @PathVariable String courseId
     ) {
-        //TODO: BATCH!
-//        return ResponseEntity.ok(courseService.includeMember(courseId, memberId));
-        return null;
+        return ResponseEntity.ok(courseService.addMembers(userAddInBatchRequest, courseId));
     }
 }

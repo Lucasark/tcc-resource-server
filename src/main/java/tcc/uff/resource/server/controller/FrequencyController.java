@@ -19,9 +19,11 @@ import tcc.uff.resource.server.model.request.AttendanceRequest;
 import tcc.uff.resource.server.model.request.FrequencyQueryRequest;
 import tcc.uff.resource.server.model.response.FrequencyCreateResponse;
 import tcc.uff.resource.server.model.response.entity.FrequencyMapperResponse;
+import tcc.uff.resource.server.model.response.entity.FrequencyResponse;
 import tcc.uff.resource.server.service.impl.FrequencyServiceImpl;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Validated
@@ -36,19 +38,21 @@ public class FrequencyController {
     @Operation(summary = "Frequencia de todo um curso pela data")
     @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
     public ResponseEntity<List<FrequencyMapperResponse>> getQueryFrequency(Authentication authentication,
-                                                                           @ParameterObject @Valid FrequencyQueryRequest frequencyQueryRequest,
+                                                                           @ParameterObject FrequencyQueryRequest frequencyQueryRequest,
                                                                            @PathVariable String courseId
     ) {
-        return ResponseEntity.ok(frequencyService.getFrequencies(courseId, frequencyQueryRequest.getStart(), frequencyQueryRequest.getEnd()));
+        if (Objects.nonNull(frequencyQueryRequest.getStart()) ^ Objects.nonNull(frequencyQueryRequest.getEnd())) {
+            return ResponseEntity.ok(frequencyService.getFrequencies(courseId, frequencyQueryRequest.getStart(), frequencyQueryRequest.getEnd()));
+        }
+        return ResponseEntity.ok(frequencyService.getAllFrequencies(courseId));
     }
 
     @GetMapping("/courses/{courseId}/member")
     @Operation(summary = "Frequencia de membro de um curso")
     @PreAuthorize("@preAuthorize.isMemberCourse(authentication.name, #courseId)")
-    public Object getMemberFrequency(Authentication authentication,
-                                     @PathVariable String courseId) {
-        //TODO GET PARA PEGAR A FREQUENCIA DE UM MEMBRO PELO MEMBRO;
-        return null;
+    public ResponseEntity<List<FrequencyResponse>> getMemberFrequency(Authentication authentication,
+                                                                      @PathVariable String courseId) {
+        return ResponseEntity.ok(frequencyService.getAllFrequenciesOfMember(courseId, authentication.getName()));
     }
 
     @PostMapping("/courses/{courseId}")
@@ -59,7 +63,5 @@ public class FrequencyController {
     ) {
         return ResponseEntity.ok(frequencyService.initFrenquency(courseId, request.getDate()));
     }
-
-    //PLANILHA DE FREQUENCIA!
 
 }

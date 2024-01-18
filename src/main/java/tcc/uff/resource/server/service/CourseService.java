@@ -1,6 +1,8 @@
 package tcc.uff.resource.server.service;
 
 import tcc.uff.resource.server.model.request.CourseRequest;
+import tcc.uff.resource.server.model.request.UserAddInBatchRequest;
+import tcc.uff.resource.server.model.response.CourseBatchMemberResponse;
 import tcc.uff.resource.server.model.response.entity.CourseResponse;
 
 import java.util.List;
@@ -23,4 +25,5 @@ public interface CourseService {
     CourseResponse getCourse(String courseId);
 
     CourseResponse addMember(String courseId, String memberId, String memberAlias, String memberRegistration);
+    CourseBatchMemberResponse addMembers(UserAddInBatchRequest userAddInBatchRequest, String courseId);
 }
