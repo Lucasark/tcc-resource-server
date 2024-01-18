@@ -9,6 +9,10 @@ import tcc.uff.resource.server.model.document.DaysOfWeek;
 import tcc.uff.resource.server.model.document.UserAlias;
 import tcc.uff.resource.server.model.document.UserDocument;
 import tcc.uff.resource.server.model.request.CourseRequest;
+import tcc.uff.resource.server.model.request.UserAddInBatchRequest;
+import tcc.uff.resource.server.model.request.UserAddRequest;
+import tcc.uff.resource.server.model.response.CourseBatchMemberResponse;
+import tcc.uff.resource.server.model.response.UserAddResponse;
 import tcc.uff.resource.server.model.response.entity.CourseResponse;
 import tcc.uff.resource.server.repository.CourseRepository;
 import tcc.uff.resource.server.repository.UserRepository;
@@ -125,14 +129,30 @@ public class CourseServiceImpl implements CourseService {
                 .courseId(courseId)
                 .build());
 
-        mongoOperations.addInSet("email", user.getEmail(), "aliases",
-                UserAlias.builder().name(memberAlias).courseId(courseId).build(), UserDocument.class);
+        mongoOperations.addInSet("email", user.getEmail(), "aliases", UserAlias.builder().name(memberAlias).courseId(courseId).build(), UserDocument.class);
 
         mongoOperations.addInSet("id", courseId, "members", user, CourseDocument.class);
 
         return courseResponseConverter.toCourseResponse(courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Erro ao recuperar"))
         );
+    }
+
+    @Override
+    public CourseBatchMemberResponse addMembers(UserAddInBatchRequest userAddInBatchRequest, String courseId) {
+        CourseBatchMemberResponse response = CourseBatchMemberResponse.builder().build();
+
+        for (UserAddRequest userAddRequest : userAddInBatchRequest.getMembers()) {
+            try {
+                addMember(courseId, userAddRequest.getEmail(), userAddRequest.getAlias(), userAddRequest.getRegistration());
+            } catch (Exception e) {
+                var userError = mapper.map(userAddRequest, UserAddResponse.class);
+                userError.setReason(e.getMessage());
+                response.getFailed().add(userError);
+            }
+        }
+
+        return response;
     }
 
 }
