@@ -17,7 +17,6 @@ import tcc.uff.resource.server.model.response.entity.CourseResponse;
 import tcc.uff.resource.server.repository.CourseRepository;
 import tcc.uff.resource.server.repository.UserRepository;
 import tcc.uff.resource.server.service.CourseService;
-import tcc.uff.resource.server.service.mongooperations.MongoOperationsService;
 
 import java.util.List;
 
@@ -32,8 +31,6 @@ public class CourseServiceImpl implements CourseService {
     private final CourseResponseConverter courseResponseConverter;
 
     private final UserRepository userRepository;
-
-    private final MongoOperationsService mongoOperations;
 
     @Override
     public List<CourseResponse> getAllCourserOwnerByUser(String username) {
@@ -129,9 +126,10 @@ public class CourseServiceImpl implements CourseService {
                 .courseId(courseId)
                 .build());
 
-        mongoOperations.addInSet("email", user.getEmail(), "aliases", UserAlias.builder().name(memberAlias).courseId(courseId).build(), UserDocument.class);
 
-        mongoOperations.addInSet("id", courseId, "members", user, CourseDocument.class);
+        userRepository.addInSet(memberId, "aliases", UserAlias.builder().name(memberAlias).courseId(courseId).build());
+
+        courseRepository.addInSet(courseId, "members", user);
 
         return courseResponseConverter.toCourseResponse(courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Erro ao recuperar"))

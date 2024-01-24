@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tcc.uff.resource.server.exceptions.TempException;
 import tcc.uff.resource.server.model.document.Attendance;
-import tcc.uff.resource.server.model.document.CourseDocument;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
 import tcc.uff.resource.server.model.document.UserAlias;
 import tcc.uff.resource.server.model.document.UserDocument;
@@ -15,7 +14,6 @@ import tcc.uff.resource.server.model.response.entity.FrequencyMapperResponse;
 import tcc.uff.resource.server.model.response.entity.FrequencyResponse;
 import tcc.uff.resource.server.repository.CourseRepository;
 import tcc.uff.resource.server.repository.FrequencyRepository;
-import tcc.uff.resource.server.service.mongooperations.MongoOperationsService;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -38,8 +36,6 @@ public class FrequencyServiceImpl {
 
     private final FrequencyRepository frequencyRepository;
 
-    private final MongoOperationsService mongoOperationsService;
-
     public FrequencyCreateResponse initFrenquency(String courseId, Instant date) throws RuntimeException {
 
         var courseDocument = courseRepository.findById(courseId)
@@ -61,7 +57,7 @@ public class FrequencyServiceImpl {
 
         frequencyRepository.save(frequencyNew);
 
-        mongoOperationsService.addInSet("id", courseId, "frequencies", frequencyNew.getId(), CourseDocument.class);
+        courseRepository.addInSet(courseId, "frequencies", frequencyNew.getId());
 
         return FrequencyCreateResponse.builder()
                 .id(frequencyNew.getId())
@@ -79,7 +75,7 @@ public class FrequencyServiceImpl {
 
         frequencyDocument.getCourse().getMembers().forEach(member -> {
             if (!attendances.containsKey(member.getEmail())) {
-                mongoOperationsService.addInSet("id", frequencyDocument.getId(), "attendances", Attendance.builder().student(member).build(), FrequencyDocument.class);
+                frequencyRepository.addInSet(frequencyDocument.getId(), "attendances", Attendance.builder().student(member).build());
             }
         });
     }
