@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import tcc.uff.resource.server.model.document.Attendance;
-import tcc.uff.resource.server.model.document.FrequencyDocument;
+import tcc.uff.resource.server.model.document.UserAlias;
 import tcc.uff.resource.server.model.enums.AttendanceEnum;
 import tcc.uff.resource.server.model.enums.AttendanceStatusEnum;
 import tcc.uff.resource.server.model.enums.CommandResponseWebSocketEnum;
@@ -16,7 +16,6 @@ import tcc.uff.resource.server.model.response.AttendanceActivedResponse;
 import tcc.uff.resource.server.repository.FrequencyRepository;
 import tcc.uff.resource.server.repository.UserRepository;
 import tcc.uff.resource.server.service.AttendanceService;
-import tcc.uff.resource.server.service.mongooperations.MongoOperationsService;
 
 import java.io.IOException;
 import java.util.Map;
@@ -31,7 +30,6 @@ public class AttendanceServiceImpl implements AttendanceService {
     private final FrequencyRepository frequencyRepository;
     private final FrequencyServiceImpl frequencyService;
     private final UserRepository userRepository;
-    private final MongoOperationsService mongoOperationsService;
 
     public void updateFrequency(String course, String code, String member) {
         var attendanceHandler = attendances.get(course);
@@ -40,24 +38,35 @@ public class AttendanceServiceImpl implements AttendanceService {
             var frequency = frequencyRepository.findByDateAndCourseId(attendanceHandler.getDate(), course)
                     .orElseThrow(() -> new RuntimeException("Frequencia n existe!"));
 
-            if (frequency.getAttendances().stream().anyMatch(anyAttendance -> anyAttendance.getStudent().getEmail().equals(member)))
-                throw new RuntimeException("Já marcou presença!");
-
             var user = userRepository.findById(member)
                     .orElseThrow(() -> new RuntimeException("N achou User!"));
 
-            var attendance = Attendance.builder()
-                    .status(AttendanceEnum.PRESENT)
-                    .student(user)
-                    .build();
+            var attendence = frequency.getAttendances().stream()
+                    .filter(a -> a.getStudent().getEmail().equals(member))
+                    .findAny()
+                    .orElseGet(() -> Attendance.builder()
+                            .status(AttendanceEnum.PRESENT)
+                            .student(user)
+                            .build());
 
-            mongoOperationsService.addInSet("id", frequency.getId(), "attendances", attendance, FrequencyDocument.class);
+            if (!attendence.getStatus().equals(AttendanceEnum.PRESENT)){
+                throw new RuntimeException("Aluno já marcou presença!");
+            }
+
+            attendence.setStatus(AttendanceEnum.PRESENT);
+            frequency.getAttendances().add(attendence);
+            frequencyRepository.save(frequency);
+
+            var alias = user.getAliases().stream()
+                    .filter(a -> a.getCourseId().equals(course))
+                    .findAny()
+                    .orElseGet(() -> UserAlias.builder().name("S/A").build());
 
             try {
                 var response = WebSocketResponse.builder()
                         .type(CommandResponseWebSocketEnum.MEMBER_INCLUDED)
                         .description("Aluno marcou presença")
-                        .value(code)
+                        .value(alias.getName())
                         .build();
 
                 if (attendanceHandler.getSession().isOpen())
@@ -93,12 +102,10 @@ public class AttendanceServiceImpl implements AttendanceService {
             }
         }
 
-        mongoOperationsService.addInSet("id", frequencyId,
-                "attendances", Attendance.builder()
-                        .student(userRepository.findById(memberId).orElseThrow(() -> new RuntimeException("Membro n existe")))
-                        .status(toAttendance)
-                        .build(),
-                FrequencyDocument.class
+        frequencyRepository.addInSet(frequencyId, "attendances", Attendance.builder()
+                .student(userRepository.findById(memberId).orElseThrow(() -> new RuntimeException("Membro n existe")))
+                .status(toAttendance)
+                .build()
         );
     }
 

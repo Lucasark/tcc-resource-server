@@ -4,10 +4,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tcc.uff.resource.server.model.enums.AttendanceEnum;
-import tcc.uff.resource.server.model.enums.DayOfWeekEnum;
 import tcc.uff.resource.server.model.response.GenericOption;
 import tcc.uff.resource.server.model.response.SelectOption;
-import tcc.uff.resource.server.model.response.models.DaysOfWeeks;
 import tcc.uff.resource.server.model.response.models.Frequencies;
 import tcc.uff.resource.server.model.response.models.Periods;
 
@@ -18,25 +16,6 @@ import java.util.Arrays;
 @RestController
 @RequestMapping("/models")
 public class ModelController {
-
-    @GetMapping("/daysOfWeek")
-    public DaysOfWeeks getDaysOfWeek() {
-
-        var days = DayOfWeekEnum.getAllAttrbsSortedById();
-
-        var daysResponse = new ArrayList<GenericOption>();
-
-        days.forEach(day ->
-                daysResponse.add(GenericOption.builder()
-                        .id(day.getId())
-                        .name(day.getName())
-                        .build())
-        );
-
-        return DaysOfWeeks.builder()
-                .daysOfWeek(daysResponse)
-                .build();
-    }
 
     @GetMapping("/periods")
     public Periods getPeriods() {

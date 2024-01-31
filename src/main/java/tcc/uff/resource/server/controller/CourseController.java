@@ -35,6 +35,8 @@ import java.util.List;
 @RequestMapping("/courses")
 public class CourseController {
 
+    //TODO: Get Info do Professor
+
     private final CourseService courseService;
 
     @GetMapping("/owner")

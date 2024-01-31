@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import tcc.uff.resource.server.model.document.UserDocument;
 
 @Repository
-public interface UserRepository extends MongoRepository<UserDocument, String> {
+public interface UserRepository extends MongoRepository<UserDocument, String>, CustomizedUserRepository {
 }

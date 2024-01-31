@@ -6,7 +6,7 @@ import tcc.uff.resource.server.model.document.CourseDocument;
 import java.util.List;
 import java.util.Optional;
 
-public interface CourseRepository extends MongoRepository<CourseDocument, String> {
+public interface CourseRepository extends MongoRepository<CourseDocument, String>, CustomizedCourseRepository {
 
     List<CourseDocument> findByTeacherEmail(String user);
 

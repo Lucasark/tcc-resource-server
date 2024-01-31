@@ -28,4 +28,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getInfoUser(authentication.getName()));
     }
 
+    //Patch para mudar os valores
+    //incluir about, phone, email
 }

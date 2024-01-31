@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -123,6 +124,7 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
                 }
             } else {
                 frequencyService.endLastFrequencyOfCourse(courseId);
+                finisheSessionByCourseId(courseId);
                 frequencyService.initFrenquency(courseId, date);
             }
 
@@ -134,7 +136,7 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
         }
         if (CommandRequestWebSocketEnum.STOP.equals(request.getType())) {
             finisheSessionByCourseId(courseId);
-            session.close();
+            closeSession(session);
             frequencyService.getLastStartedFrequencyByCourse(courseId).ifPresent(this::finisheFrequency);
         }
     }
@@ -149,4 +151,20 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
     private void finisheFrequency(FrequencyDocument frequencyDocument) {
         frequencyService.endFrenquecyByCourse(frequencyDocument);
     }
+
+
+    private void closeSession(WebSocketSession session){
+        var response = ErrorResponse.builder()
+                .code(String.valueOf(CloseStatus.NORMAL.getCode()))
+                .message("Fechado com sucesso!")
+                .description("A solicação foi finalizada com sucesso!")
+                .build();
+
+        try {
+            session.close(CloseStatus.NORMAL.withReason(new ObjectMapper().writeValueAsString(response)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
