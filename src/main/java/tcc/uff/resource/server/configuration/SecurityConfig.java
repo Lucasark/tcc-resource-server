@@ -31,7 +31,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(registry -> registry
-                        .requestMatchers("/", "/login", "/login-error", "/*.css", "/*.js", "/*.swf", "/tests/**", "/error/**", "/models/**",
+                        .requestMatchers("/", "/login", "/login-error", "/*.css", "/*.js", "/*.swf", "/tests/**", "/error/**", "/models/**", "/batch-process/**",
                                 "/swagger-ui/**", "/v3/**","/attendances/ws/**", "/*.ico").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -42,7 +42,7 @@ public class SecurityConfig {
 
     @Bean
     WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.debug(true);
+        return (web) -> web.debug(false);
     }
 
     @Bean

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import tcc.uff.resource.server.model.document.Attendance;
+import tcc.uff.resource.server.model.document.UserAlias;
 import tcc.uff.resource.server.model.enums.AttendanceEnum;
 import tcc.uff.resource.server.model.enums.AttendanceStatusEnum;
 import tcc.uff.resource.server.model.enums.CommandResponseWebSocketEnum;
@@ -37,24 +38,35 @@ public class AttendanceServiceImpl implements AttendanceService {
             var frequency = frequencyRepository.findByDateAndCourseId(attendanceHandler.getDate(), course)
                     .orElseThrow(() -> new RuntimeException("Frequencia n existe!"));
 
-            if (frequency.getAttendances().stream().anyMatch(anyAttendance -> anyAttendance.getStudent().getEmail().equals(member)))
-                throw new RuntimeException("Já marcou presença!");
-
             var user = userRepository.findById(member)
                     .orElseThrow(() -> new RuntimeException("N achou User!"));
 
-            var attendance = Attendance.builder()
-                    .status(AttendanceEnum.PRESENT)
-                    .student(user)
-                    .build();
+            var attendence = frequency.getAttendances().stream()
+                    .filter(a -> a.getStudent().getEmail().equals(member))
+                    .findAny()
+                    .orElseGet(() -> Attendance.builder()
+                            .status(AttendanceEnum.PRESENT)
+                            .student(user)
+                            .build());
 
-            frequencyRepository.addInSet(frequency.getId(), "attendances", attendance);
+            if (!attendence.getStatus().equals(AttendanceEnum.PRESENT)){
+                throw new RuntimeException("Aluno já marcou presença!");
+            }
+
+            attendence.setStatus(AttendanceEnum.PRESENT);
+            frequency.getAttendances().add(attendence);
+            frequencyRepository.save(frequency);
+
+            var alias = user.getAliases().stream()
+                    .filter(a -> a.getCourseId().equals(course))
+                    .findAny()
+                    .orElseGet(() -> UserAlias.builder().name("S/A").build());
 
             try {
                 var response = WebSocketResponse.builder()
                         .type(CommandResponseWebSocketEnum.MEMBER_INCLUDED)
                         .description("Aluno marcou presença")
-                        .value(code)
+                        .value(alias.getName())
                         .build();
 
                 if (attendanceHandler.getSession().isOpen())

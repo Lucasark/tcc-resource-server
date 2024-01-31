@@ -18,4 +18,9 @@ public class CustomizedUserRepositoryImpl extends CustomizedAbstractMongoOperati
     public Class<UserDocument> getTypedClass() {
         return UserDocument.class;
     }
+
+    @Override
+    public String getId() {
+        return "_id";
+    }
 }
