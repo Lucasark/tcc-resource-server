@@ -24,4 +24,6 @@ public class CourseRequest {
 
     private String about;
 
+    private CourseLocationRequest location;
+
 }

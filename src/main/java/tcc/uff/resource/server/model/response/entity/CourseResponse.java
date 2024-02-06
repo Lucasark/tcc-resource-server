@@ -33,4 +33,6 @@ public class CourseResponse implements Serializable {
     @Builder.Default
     private Set<CurseMemberResponse> members = new HashSet<>();
 
+    private CourseLocationResponse location;
+
 }

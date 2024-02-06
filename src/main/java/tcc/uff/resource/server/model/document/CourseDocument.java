@@ -51,6 +51,7 @@ public class CourseDocument {
     @Builder.Default
     private Set<UserDocument> members = new HashSet<>();
 
+    private CourseLocation location;
 
     //Embed
     @Builder.Default
