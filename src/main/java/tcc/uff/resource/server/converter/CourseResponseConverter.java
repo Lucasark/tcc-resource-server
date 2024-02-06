@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import tcc.uff.resource.server.model.document.CourseDocument;
 import tcc.uff.resource.server.model.document.UserAlias;
 import tcc.uff.resource.server.model.response.entity.CourseResponse;
-import tcc.uff.resource.server.model.response.entity.UserResponse;
+import tcc.uff.resource.server.model.response.entity.CurseMemberResponse;
 
 @Slf4j
 @Service
@@ -19,8 +19,6 @@ public class CourseResponseConverter {
     public CourseResponse toCourseResponse(CourseDocument document) {
 
         var response = this.mapper.map(document, CourseResponse.class);
-        response.setOwner(document.getTeacher().getEmail());
-        response.setTeacher(document.getTeacher().getName());
         response.getMembers().clear();
 
         document.getMembers().forEach(memberDocument -> {
@@ -32,7 +30,8 @@ public class CourseResponseConverter {
                             .orElse("S/A");
 
                     response.getMembers().add(
-                            UserResponse.builder()
+                            CurseMemberResponse.builder()
+                                    .name(memberDocument.getName())
                                     .email(memberDocument.getEmail())
                                     .registration(memberDocument.getRegistration())
                                     .alias(alias)

@@ -7,18 +7,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse implements Serializable {
+public class UserInfoResponse implements Serializable {
 
-    private String email;
+    private String about;
 
-    private String name;
-
-    private UserInfoResponse info;
+    @Builder.Default
+    private Set<UserContactResponse> contacts = new HashSet<>();
 
 }

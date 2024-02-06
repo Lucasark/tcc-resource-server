@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import tcc.uff.resource.server.converter.Instant2StringConverter;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 @Getter
@@ -15,7 +16,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DaysOfWeekResponse {
+public class DaysOfWeekResponse implements Serializable {
 
     @JsonSerialize(converter = Instant2StringConverter.class)
     private Instant start;

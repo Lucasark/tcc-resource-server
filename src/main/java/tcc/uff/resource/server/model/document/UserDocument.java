@@ -31,11 +31,10 @@ public class UserDocument {
 
     /**
      * Se vier do:
-     *
+     * <p>
      * - OAuth
      * - Dono do User altearando
      * - Pela Planilha
-     *
      */
     private String registration;
 
@@ -45,13 +44,15 @@ public class UserDocument {
     @Builder.Default
     private Set<UserAlias> aliases = new HashSet<>();
 
+    private UserInfo info;
+
     @Version
     private Long version;
 
     @CreatedDate
-    protected LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    protected LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
 }
