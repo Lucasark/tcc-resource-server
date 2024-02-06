@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class Frequencies implements Serializable {
+public class UserContact implements Serializable {
 
-    private List<GenericOption> frequencies;
+    private List<GenericOption> contacts;
 }

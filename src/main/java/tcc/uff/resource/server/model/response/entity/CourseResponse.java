@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourseResponse {
+public class CourseResponse implements Serializable {
 
     private String id;
 
@@ -22,15 +23,14 @@ public class CourseResponse {
 
     private String period;
 
-    private Set<DaysOfWeekResponse> daysOfWeek;
+    @Builder.Default
+    private Set<DaysOfWeekResponse> daysOfWeek = new HashSet<>();
 
     private String about;
 
-    private String owner;
-
-    private String teacher;
+    private CurseTeacherResponse teacher;
 
     @Builder.Default
-    private Set<UserResponse> members = new HashSet<>();
+    private Set<CurseMemberResponse> members = new HashSet<>();
 
 }

@@ -13,12 +13,10 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse implements Serializable {
+public class UserContactResponse implements Serializable {
 
-    private String email;
+    private String type;
 
-    private String name;
-
-    private UserInfoResponse info;
+    private String value;
 
 }

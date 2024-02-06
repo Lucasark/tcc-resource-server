@@ -13,12 +13,10 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse implements Serializable {
+public class CurseTeacherResponse implements Serializable {
 
     private String email;
 
     private String name;
-
-    private UserInfoResponse info;
 
 }
