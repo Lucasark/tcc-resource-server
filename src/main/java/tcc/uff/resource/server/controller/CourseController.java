@@ -69,7 +69,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.putCourse(request, courseId));
     }
 
-    @PostMapping()
+    @PostMapping
     @Operation(summary = "Criar um curso")
     public ResponseEntity<CourseResponse> createCourse(Authentication authentication,
                                                        @RequestBody @Valid CourseRequest request
