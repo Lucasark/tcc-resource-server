@@ -49,7 +49,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                             .student(user)
                             .build());
 
-            if (!attendence.getStatus().equals(AttendanceEnum.PRESENT)){
+            if (attendence.getStatus().equals(AttendanceEnum.PRESENT)){
                 throw new RuntimeException("Aluno já marcou presença!");
             }
 
