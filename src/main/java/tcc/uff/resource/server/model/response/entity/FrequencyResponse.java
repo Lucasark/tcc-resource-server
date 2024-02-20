@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
 
@@ -16,6 +17,7 @@ import java.time.Instant;
 public class FrequencyResponse {
 
     //BUG: https://github.com/spring-projects/spring-data-mongodb/issues/4645
+    @Field("id")
     private String id;
 
     private Instant date;
