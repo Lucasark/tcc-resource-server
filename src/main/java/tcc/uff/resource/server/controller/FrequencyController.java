@@ -41,7 +41,7 @@ public class FrequencyController {
                                                                            @ParameterObject FrequencyQueryRequest frequencyQueryRequest,
                                                                            @PathVariable String courseId
     ) {
-        if (Objects.nonNull(frequencyQueryRequest.getStart()) ^ Objects.nonNull(frequencyQueryRequest.getEnd())) {
+        if (Objects.nonNull(frequencyQueryRequest.getStart()) && Objects.nonNull(frequencyQueryRequest.getEnd())) {
             return ResponseEntity.ok(frequencyService.getFrequencies(courseId, frequencyQueryRequest.getStart(), frequencyQueryRequest.getEnd()));
         }
         return ResponseEntity.ok(frequencyService.getAllFrequencies(courseId));

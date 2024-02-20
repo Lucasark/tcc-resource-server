@@ -126,79 +126,11 @@ public class FrequencyServiceImpl {
     }
 
     public List<FrequencyMapperResponse> getFrequencies(String courseId, Instant start, Instant end) {
-        var course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new TempException("Curso n encontrado!"));
-
-        Map<String, FrequencyMapperResponse> mapResponse = new HashMap<>();
-
-        for (UserDocument userDocument : course.getMembers()) {
-            var value = FrequencyMapperResponse.builder().id(userDocument.getEmail());
-
-            var alias = userDocument.getAliases().stream()
-                    .filter(userAlias -> userAlias.getCourseId().equals(courseId))
-                    .map(UserAlias::getName)
-                    .findFirst()
-                    .orElse("S/A");
-
-            value.alias(alias);
-
-            mapResponse.put(userDocument.getEmail(), value.build());
-        }
-
-        //TODO: Pelo Pai, Do Filho e Do Espirito Santo...On^3 tranformar em Mapperes
-
-        frequencyRepository.findByDateBetweenAndCourseId(start, end, courseId).forEach(frequencyDocument -> {
-                    frequencyDocument.getAttendances().forEach(attendance -> {
-                                mapResponse.get(attendance.getStudent().getEmail()).getFrequencies()
-                                        .add(FrequencyResponse.builder()
-                                                .id(frequencyDocument.getId())
-                                                .date(frequencyDocument.getDate())
-                                                .status(attendance.getStatus().getId())
-                                                .build());
-                            }
-                    );
-                }
-        );
-
-        return new ArrayList<>(mapResponse.values());
+        return courseRepository.getViewFrequencyByCourseIdAndDate(courseId, start, end);
     }
 
     public List<FrequencyMapperResponse> getAllFrequencies(String courseId) {
-        var course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new TempException("Curso n encontrado!"));
-
-        Map<String, FrequencyMapperResponse> mapResponse = new HashMap<>();
-
-        for (UserDocument userDocument : course.getMembers()) {
-            var value = FrequencyMapperResponse.builder().id(userDocument.getEmail());
-
-            var alias = userDocument.getAliases().stream()
-                    .filter(userAlias -> userAlias.getCourseId().equals(courseId))
-                    .map(UserAlias::getName)
-                    .findFirst()
-                    .orElse("S/A");
-
-            value.alias(alias);
-
-            mapResponse.put(userDocument.getEmail(), value.build());
-        }
-
-        //TODO: Pelo Pai, Do Filho e Do Espirito Santo...On^3 tranformar em Mapperes
-
-        frequencyRepository.findAllByCourseId(courseId).forEach(frequencyDocument -> {
-                    frequencyDocument.getAttendances().forEach(attendance -> {
-                                mapResponse.get(attendance.getStudent().getEmail()).getFrequencies()
-                                        .add(FrequencyResponse.builder()
-                                                .id(frequencyDocument.getId())
-                                                .date(frequencyDocument.getDate())
-                                                .status(attendance.getStatus().getId())
-                                                .build());
-                            }
-                    );
-                }
-        );
-
-        return new ArrayList<>(mapResponse.values());
+        return courseRepository.getViewFrequencyByCourseId(courseId);
     }
 
     public List<FrequencyResponse> getAllFrequenciesOfMember(String courseId, String memberId) {

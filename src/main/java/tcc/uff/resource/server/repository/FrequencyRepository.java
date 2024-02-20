@@ -12,12 +12,14 @@ import java.util.Optional;
 @Repository
 public interface FrequencyRepository extends MongoRepository<FrequencyDocument, String>, CustomizedFrequencyRepository {
 
-    Optional<FrequencyDocument> findByDate(Instant date);
     List<FrequencyDocument> findAllByCourseId(String courseId);
+
     Optional<FrequencyDocument> findByDateAndCourseId(Instant date, String courseId);
-    List<FrequencyDocument> findByDateBetweenAndCourseId(Instant start, Instant end, String courseId);
+
     List<FrequencyDocument> findByIdInAndFinished(Collection<String> id, Boolean finished);
+
     Optional<FrequencyDocument> findByCourseIdAndDate(String courseId, Instant date);
+
     List<FrequencyDocument> findFirst1ByIdInAndFinishedOrderByDate(Collection<String> id, Boolean finished);
 
 }
