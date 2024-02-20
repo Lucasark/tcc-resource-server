@@ -15,8 +15,6 @@ public interface CourseRepository extends MongoRepository<CourseDocument, String
 
     List<CourseDocument> findByMembersEmail(String user);
 
-    Optional<CourseDocument> findByIdAndTeacherEmail(String id, String teacherEmail);
-
     @Aggregation(pipeline = {
             "{$match: {_id: {$in: [ObjectId(?0)]}}}",
             "{$unwind: '$members'}",
