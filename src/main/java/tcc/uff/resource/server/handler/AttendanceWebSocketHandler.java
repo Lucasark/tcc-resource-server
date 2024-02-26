@@ -12,7 +12,8 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
-import tcc.uff.resource.server.model.enums.CommandRequestWebSocketEnum;
+import tcc.uff.resource.server.model.enums.AttendanceOriginEnum;
+import tcc.uff.resource.server.model.enums.CommandRequestEnum;
 import tcc.uff.resource.server.model.enums.CommandResponseWebSocketEnum;
 import tcc.uff.resource.server.model.handler.AttendanceHandler;
 import tcc.uff.resource.server.model.request.WebSocketRequest;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.springframework.web.socket.CloseStatus.BAD_DATA;
 import static org.springframework.web.socket.CloseStatus.POLICY_VIOLATION;
@@ -79,7 +81,13 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
             return;
         }
 
-        if (CommandRequestWebSocketEnum.START.equals(request.getType())) {
+        if (CommandRequestEnum.START.equals(request.getType())) {
+
+            if (Objects.nonNull(request.getLongitude()) ^ Objects.nonNull(request.getLatitude())) {
+                session.close(SERVER_ERROR.withReason("Latitude e Longitude devem ser informados juntos"));
+                return;
+            }
+
             var principal = session.getPrincipal();
 
             if (principal == null || principal.getName() == null) {
@@ -97,6 +105,9 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
                     .courseId(courseId)
                     .session(session)
                     .date(date)
+                    .origin(AttendanceOriginEnum.WS)
+                    .latitude(request.getLatitude())
+                    .longitude(request.getLongitude())
                     .build();
 
             var frequencyOptional = frequencyService.getFrequencyByCourseAndDate(courseId, date);
@@ -135,7 +146,7 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
 
             attendances.get(courseId).setScheduled(schedule);
         }
-        if (CommandRequestWebSocketEnum.STOP.equals(request.getType())) {
+        if (CommandRequestEnum.STOP.equals(request.getType())) {
             finisheSessionByCourseId(courseId);
             closeSession(session);
             frequencyService.getLastStartedFrequencyByCourse(courseId).ifPresent(this::finisheFrequency);
@@ -154,7 +165,7 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
     }
 
 
-    private void closeSession(WebSocketSession session){
+    private void closeSession(WebSocketSession session) {
         var response = ErrorResponse.builder()
                 .code(String.valueOf(CloseStatus.NORMAL.getCode()))
                 .message("Fechado com sucesso!")

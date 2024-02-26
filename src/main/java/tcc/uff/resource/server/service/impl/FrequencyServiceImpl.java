@@ -3,25 +3,26 @@ package tcc.uff.resource.server.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import tcc.uff.resource.server.exceptions.TempException;
 import tcc.uff.resource.server.model.document.Attendance;
+import tcc.uff.resource.server.model.document.CourseDocument;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
-import tcc.uff.resource.server.model.document.UserAlias;
-import tcc.uff.resource.server.model.document.UserDocument;
 import tcc.uff.resource.server.model.enums.AttendanceEnum;
-import tcc.uff.resource.server.model.response.FrequencyCreateResponse;
+import tcc.uff.resource.server.model.enums.AttendanceOriginEnum;
+import tcc.uff.resource.server.model.enums.CommandRequestEnum;
+import tcc.uff.resource.server.model.handler.AttendanceHandler;
+import tcc.uff.resource.server.model.request.AttendanceRequest;
+import tcc.uff.resource.server.model.response.FrequencyHandlerResponse;
 import tcc.uff.resource.server.model.response.entity.FrequencyMapperResponse;
 import tcc.uff.resource.server.model.response.entity.FrequencyResponse;
 import tcc.uff.resource.server.repository.CourseRepository;
 import tcc.uff.resource.server.repository.FrequencyRepository;
+import tcc.uff.resource.server.utils.GenerateString;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -36,16 +37,22 @@ public class FrequencyServiceImpl {
 
     private final FrequencyRepository frequencyRepository;
 
-    public FrequencyCreateResponse initFrenquency(String courseId, Instant date) throws RuntimeException {
+    public void initFrenquency(String courseId, Instant date) throws RuntimeException {
 
         var courseDocument = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("N achou Classe!"));
+
+        initFrenquency(courseDocument, date);
+    }
+
+    public void initFrenquency(CourseDocument courseDocument, Instant date) throws RuntimeException {
 
         Set<Attendance> attendances = new HashSet<>();
 
         courseDocument.getMembers().forEach(member ->
                 attendances.add(Attendance.builder()
                         .student(member)
+                        .status(AttendanceEnum.MISS)
                         .build())
         );
 
@@ -57,27 +64,14 @@ public class FrequencyServiceImpl {
 
         frequencyRepository.save(frequencyNew);
 
-        courseRepository.addInSet(courseId, "frequencies", frequencyNew.getId());
-
-        return FrequencyCreateResponse.builder()
-                .id(frequencyNew.getId())
-                .date(date)
-                .course(courseDocument.getId())
-                .build();
+        courseRepository.addInSet(courseDocument.getId(), "frequencies", frequencyNew.getId());
     }
+
 
     public void endFrenquecyByCourse(FrequencyDocument frequencyDocument) {
         frequencyDocument.setFinished(Boolean.TRUE);
         frequencyDocument.setFinishedAt(LocalDateTime.now());
         frequencyRepository.save(frequencyDocument);
-
-        var attendances = frequencyDocument.getAttendances().stream().collect(toMap(a -> a.getStudent().getEmail(), Attendance::getStudent));
-
-        frequencyDocument.getCourse().getMembers().forEach(member -> {
-            if (!attendances.containsKey(member.getEmail())) {
-                frequencyRepository.addInSet(frequencyDocument.getId(), "attendances", Attendance.builder().student(member).build());
-            }
-        });
     }
 
     public void endLastFrequencyOfCourse(String courseId) {
@@ -160,6 +154,9 @@ public class FrequencyServiceImpl {
         );
 
         return frequencyResponses;
+    }
+
+    private void finish() {
 
     }
 }

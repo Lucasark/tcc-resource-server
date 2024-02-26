@@ -17,9 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tcc.uff.resource.server.model.request.AttendanceRequest;
 import tcc.uff.resource.server.model.request.FrequencyQueryRequest;
-import tcc.uff.resource.server.model.response.FrequencyCreateResponse;
+import tcc.uff.resource.server.model.response.FrequencyHandlerResponse;
 import tcc.uff.resource.server.model.response.entity.FrequencyMapperResponse;
 import tcc.uff.resource.server.model.response.entity.FrequencyResponse;
+import tcc.uff.resource.server.service.impl.FrequencyHandlerServiceImpl;
 import tcc.uff.resource.server.service.impl.FrequencyServiceImpl;
 
 import java.util.List;
@@ -33,6 +34,8 @@ import java.util.Objects;
 public class FrequencyController {
 
     private final FrequencyServiceImpl frequencyService;
+
+    private final FrequencyHandlerServiceImpl frequencyHandlerService;
 
     @GetMapping("/courses/{courseId}/owner")
     @Operation(summary = "Frequencia de todo um curso pela data")
@@ -55,13 +58,13 @@ public class FrequencyController {
         return ResponseEntity.ok(frequencyService.getAllFrequenciesOfMember(courseId, authentication.getName()));
     }
 
-    @PostMapping("/courses/{courseId}")
+    @PostMapping("/courses/{courseId}/handler")
     @Operation(summary = "Cria uma Chamada para um Curso com Validador Estatico")
     @PreAuthorize("@preAuthorize.isOwnerCourse(authentication.name, #courseId)")
-    public ResponseEntity<FrequencyCreateResponse> createAttendance(@Valid @RequestBody AttendanceRequest request,
-                                                                    @PathVariable String courseId
+    public ResponseEntity<FrequencyHandlerResponse> handlerAttendance(@Valid @RequestBody AttendanceRequest request,
+                                                                      @PathVariable String courseId
     ) {
-        return ResponseEntity.ok(frequencyService.initFrenquency(courseId, request.getDate()));
+        return ResponseEntity.ok(frequencyHandlerService.handlerFrenquency(courseId, request));
     }
 
 }
