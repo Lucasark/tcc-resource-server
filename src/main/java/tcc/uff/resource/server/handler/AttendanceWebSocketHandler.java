@@ -37,6 +37,7 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
 
     private final TaskScheduler taskScheduler;
 
+    //TODO: REMOVER
     private final Map<String, AttendanceHandler> attendances;
 
     private final CourseService courseService;
