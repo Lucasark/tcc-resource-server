@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tcc.uff.resource.server.model.enums.CommandRequestWebSocketEnum;
+import tcc.uff.resource.server.model.enums.CommandRequestEnum;
 
 import java.time.Instant;
 
@@ -18,6 +18,10 @@ public class WebSocketRequest {
 
     private Instant date;
 
-    private CommandRequestWebSocketEnum type;
+    private CommandRequestEnum type;
+
+    private String latitude;
+
+    private String longitude;
 
 }

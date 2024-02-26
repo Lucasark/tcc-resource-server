@@ -6,43 +6,22 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import tcc.uff.resource.server.converter.mongo.AttendanceEnumReadConverter;
 import tcc.uff.resource.server.converter.mongo.AttendanceEnumWriteConverter;
+import tcc.uff.resource.server.converter.mongo.UserContactEnumReadConverter;
+import tcc.uff.resource.server.converter.mongo.UserContactEnumWriteConverter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//class MongoDBConfig extends AbstractMongoClientConfiguration {
-
 @Configuration
 class MongoDBConfig {
-
-//    @Value("${DB_NAME}")
-//    private String dbName;
-//
-//    @Value("${MONGO_URI}")
-//    private String uri;
-//
-//    @Override
-//    public @Bean
-//    @NonNull MongoClient mongoClient() {
-//        return MongoClients.create(uri);
-//    }
-//
-//    @Bean
-//    MongoTransactionManager transactionManager(MongoDatabaseFactory dbFactory) {
-//        return new MongoTransactionManager(dbFactory);
-//    }
-//
-//    @Override
-//    protected @NonNull String getDatabaseName() {
-//        return dbName;
-//    }
-
 
     @Bean
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converterList = new ArrayList<>();
         converterList.add(new AttendanceEnumReadConverter());
         converterList.add(new AttendanceEnumWriteConverter());
+        converterList.add(new UserContactEnumReadConverter());
+        converterList.add(new UserContactEnumWriteConverter());
         return new MongoCustomConversions(converterList);
     }
 

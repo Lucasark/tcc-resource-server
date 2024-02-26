@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tcc.uff.resource.server.model.enums.CommandRequestEnum;
 
 import java.time.Instant;
 
@@ -14,7 +15,7 @@ import static tcc.uff.resource.server.utils.Constants.OFF_DATE_TIME_PATTERN;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FrequencyCreateResponse {
+public class FrequencyHandlerResponse {
 
     private String id;
 
@@ -24,5 +25,7 @@ public class FrequencyCreateResponse {
     private String code;
 
     private String course;
+
+    private CommandRequestEnum status;
 
 }

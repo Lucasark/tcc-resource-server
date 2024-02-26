@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.web.socket.WebSocketSession;
+import tcc.uff.resource.server.model.enums.AttendanceOriginEnum;
 
 import java.time.Instant;
 import java.util.concurrent.ScheduledFuture;
@@ -29,5 +30,9 @@ public class AttendanceHandler {
 
     private ScheduledFuture<?> scheduled;
 
+    private AttendanceOriginEnum origin;
 
+    private String latitude;
+
+    private String longitude;
 }

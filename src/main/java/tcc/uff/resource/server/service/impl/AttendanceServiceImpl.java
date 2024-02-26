@@ -82,9 +82,19 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     public AttendanceActivedResponse isActived(String courseId) {
-        if (attendances.containsKey(courseId)) {
-            return AttendanceActivedResponse.builder().status(AttendanceStatusEnum.STARTED).build();
+
+        var attendance = attendances.get(courseId);
+
+        if (Objects.nonNull(attendance)) {
+
+            return AttendanceActivedResponse.builder()
+                    .origin(attendance.getOrigin())
+                    .status(AttendanceStatusEnum.STARTED)
+                    .latitude(attendance.getLatitude())
+                    .longitude(attendance.getLongitude())
+                    .build();
         }
+
         return AttendanceActivedResponse.builder().status(AttendanceStatusEnum.NOT_STARTED).build();
     }
 
@@ -115,5 +125,9 @@ public class AttendanceServiceImpl implements AttendanceService {
         frequencyService.endLastFrequencyOfCourse(courseId);
         attendence.getScheduled().cancel(true);
         attendances.remove(courseId);
+    }
+
+    public void addAttendance(AttendanceHandler attendanceHandler) {
+        attendances.put(attendanceHandler.getCourseId(), attendanceHandler);
     }
 }
