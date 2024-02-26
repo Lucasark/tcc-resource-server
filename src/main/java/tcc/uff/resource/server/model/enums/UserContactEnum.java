@@ -1,5 +1,6 @@
 package tcc.uff.resource.server.model.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -41,6 +42,7 @@ public enum UserContactEnum {
                 .collect(Collectors.toList());
     }
 
+    @JsonCreator
     public static UserContactEnum fromId(Integer type) {
         return Arrays.stream(values())
                 .filter(file -> Objects.equals(file.getId(), type))
