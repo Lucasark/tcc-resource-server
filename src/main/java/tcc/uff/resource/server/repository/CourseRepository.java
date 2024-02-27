@@ -7,7 +7,6 @@ import tcc.uff.resource.server.model.response.entity.FrequencyMapperResponse;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 public interface CourseRepository extends MongoRepository<CourseDocument, String>, CustomizedCourseRepository {
 
@@ -38,7 +37,8 @@ public interface CourseRepository extends MongoRepository<CourseDocument, String
             "{$addFields: {frequenciesWithMatchingAttendances: {$map: {input: '$frequenciesWithMatchingAttendances', as: 'frequency', in: {" +
                     "id: {$toString: '$$frequency._id'}," +
                     "date: '$$frequency.date'," +
-                    "status: {$arrayElemAt: ['$$frequency.attendances.status', 0]}}}}}}",
+                    "status: {$arrayElemAt: [{$map: {input: {$filter: {input: '$$frequency.attendances', as: 'attendance', cond: {$eq: ['$$attendance.student.$id', '$user._id']},}}, as: 'filteredAttendance', in: '$$filteredAttendance.status'}}, 0]" +
+                    "}}}}}}",
             "{$project: {_id: 0, id: {$toString :'$user._id'}, alias: '$alias', frequencies: '$frequenciesWithMatchingAttendances'}}"
     })
     List<FrequencyMapperResponse> getViewFrequencyByCourseId(String courseId);
@@ -68,7 +68,8 @@ public interface CourseRepository extends MongoRepository<CourseDocument, String
             "{$addFields: {frequenciesWithMatchingAttendances: {$map: {input: '$frequenciesWithMatchingAttendances', as: 'frequency', in: {" +
                     "id: {$toString: '$$frequency._id'}," +
                     "date: '$$frequency.date'," +
-                    "status: {$arrayElemAt: ['$$frequency.attendances.status', 0]}}}}}}",
+                    "status: {$arrayElemAt: [{$map: {input: {$filter: {input: '$$frequency.attendances', as: 'attendance', cond: {$eq: ['$$attendance.student.$id', '$user._id']},}}, as: 'filteredAttendance', in: '$$filteredAttendance.status'}}, 0]" +
+                    "}}}}}}",
             "{$project: {_id: 0, id: {$toString :'$user._id'}, alias: '$alias', frequencies: '$frequenciesWithMatchingAttendances'}}"
     })
     List<FrequencyMapperResponse> getViewFrequencyByCourseIdAndDate(String courseId, Instant start, Instant end);
