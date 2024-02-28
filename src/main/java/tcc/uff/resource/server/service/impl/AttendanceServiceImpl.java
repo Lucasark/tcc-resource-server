@@ -3,6 +3,9 @@ package tcc.uff.resource.server.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import tcc.uff.resource.server.model.document.Attendance;
@@ -49,7 +52,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                             .student(user)
                             .build());
 
-            if (attendence.getStatus().equals(AttendanceEnum.PRESENT)){
+            if (attendence.getStatus().equals(AttendanceEnum.PRESENT)) {
                 throw new RuntimeException("Aluno já marcou presença!");
             }
 
@@ -98,6 +101,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         return AttendanceActivedResponse.builder().status(AttendanceStatusEnum.NOT_STARTED).build();
     }
 
+    @Retryable(retryFor = OptimisticLockingFailureException.class, backoff = @Backoff(delay = 1000))
     public void updateAttedentceStatusByMember(String frequencyId, String memberId, Integer status) {
         var toAttendance = AttendanceEnum.fromId(status);
 
