@@ -20,8 +20,7 @@ public class WebSocketRequest {
 
     private CommandRequestEnum type;
 
-    private String latitude;
-
-    private String longitude;
+    @Builder.Default
+    private WebSocketLocationRequest location = WebSocketLocationRequest.builder().build();
 
 }
