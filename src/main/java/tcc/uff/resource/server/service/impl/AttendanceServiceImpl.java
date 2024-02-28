@@ -8,6 +8,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
+import tcc.uff.resource.server.exceptions.AttendanceException;
 import tcc.uff.resource.server.model.document.Attendance;
 import tcc.uff.resource.server.model.document.UserAlias;
 import tcc.uff.resource.server.model.enums.AttendanceEnum;
@@ -54,7 +55,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                             .build());
 
             if (attendence.getStatus().equals(AttendanceEnum.PRESENT)) {
-                throw new RuntimeException("Aluno já marcou presença!");
+                throw new AttendanceException("Aluno já marcou presença!");
             }
 
             attendence.setStatus(AttendanceEnum.PRESENT);
@@ -81,7 +82,7 @@ public class AttendanceServiceImpl implements AttendanceService {
             }
 
         } else {
-            throw new RuntimeException("N foi possivel marcar presença");
+            throw new AttendanceException("Não foi possivel marcar presença");
         }
     }
 
