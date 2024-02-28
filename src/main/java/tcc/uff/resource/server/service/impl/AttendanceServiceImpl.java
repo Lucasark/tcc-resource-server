@@ -16,6 +16,7 @@ import tcc.uff.resource.server.model.enums.CommandResponseWebSocketEnum;
 import tcc.uff.resource.server.model.handler.AttendanceHandler;
 import tcc.uff.resource.server.model.request.WebSocketResponse;
 import tcc.uff.resource.server.model.response.AttendanceActivedResponse;
+import tcc.uff.resource.server.model.response.LocationResponse;
 import tcc.uff.resource.server.repository.FrequencyRepository;
 import tcc.uff.resource.server.repository.UserRepository;
 import tcc.uff.resource.server.service.AttendanceService;
@@ -93,8 +94,10 @@ public class AttendanceServiceImpl implements AttendanceService {
             return AttendanceActivedResponse.builder()
                     .origin(attendance.getOrigin())
                     .status(AttendanceStatusEnum.STARTED)
-                    .latitude(attendance.getLatitude())
-                    .longitude(attendance.getLongitude())
+                    .location(LocationResponse.builder()
+                            .latitude(attendance.getLatitude())
+                            .longitude(attendance.getLongitude())
+                            .build())
                     .build();
         }
 

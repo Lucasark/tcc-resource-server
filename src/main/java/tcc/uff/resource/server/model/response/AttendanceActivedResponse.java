@@ -15,8 +15,5 @@ public class AttendanceActivedResponse {
 
     private AttendanceOriginEnum origin;
 
-    private String latitude;
-
-    private String longitude;
-
+    private LocationResponse location;
 }

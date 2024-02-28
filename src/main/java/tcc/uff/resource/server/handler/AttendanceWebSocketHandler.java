@@ -83,7 +83,7 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
 
         if (CommandRequestEnum.START.equals(request.getType())) {
 
-            if (Objects.nonNull(request.getLongitude()) ^ Objects.nonNull(request.getLatitude())) {
+            if (Objects.nonNull(request.getLocation().getLongitude()) ^ Objects.nonNull(request.getLocation().getLatitude())) {
                 session.close(SERVER_ERROR.withReason("Latitude e Longitude devem ser informados juntos"));
                 return;
             }
@@ -106,8 +106,8 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
                     .session(session)
                     .date(date)
                     .origin(AttendanceOriginEnum.WS)
-                    .latitude(request.getLatitude())
-                    .longitude(request.getLongitude())
+                    .latitude(request.getLocation().getLatitude())
+                    .longitude(request.getLocation().getLongitude())
                     .build();
 
             var frequencyOptional = frequencyService.getFrequencyByCourseAndDate(courseId, date);
