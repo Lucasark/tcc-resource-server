@@ -3,9 +3,6 @@ package tcc.uff.resource.server.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import tcc.uff.resource.server.exceptions.AttendanceException;
@@ -31,11 +28,13 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AttendanceServiceImpl implements AttendanceService {
 
+    //TODO: Mudar para o service
     private final Map<String, AttendanceHandler> attendances;
     private final FrequencyRepository frequencyRepository;
     private final FrequencyServiceImpl frequencyService;
     private final UserRepository userRepository;
 
+    //TODO: Precisa de uma melhora de performace
     public void updateFrequency(String course, String code, String member) {
         var attendanceHandler = attendances.get(course);
 
@@ -46,6 +45,7 @@ public class AttendanceServiceImpl implements AttendanceService {
             var user = userRepository.findById(member)
                     .orElseThrow(() -> new RuntimeException("N achou User!"));
 
+            //TODO: dá pra melhorar
             var attendence = frequency.getAttendances().stream()
                     .filter(a -> a.getStudent().getEmail().equals(member))
                     .findAny()
@@ -105,23 +105,23 @@ public class AttendanceServiceImpl implements AttendanceService {
         return AttendanceActivedResponse.builder().status(AttendanceStatusEnum.NOT_STARTED).build();
     }
 
-    @Retryable(retryFor = OptimisticLockingFailureException.class, backoff = @Backoff(delay = 1000))
     public void updateAttedentceStatusByMember(String frequencyId, String memberId, Integer status) {
         var toAttendance = AttendanceEnum.fromId(status);
 
-        var frequency = frequencyRepository.findById(frequencyId)
-                .orElseThrow(() -> new RuntimeException("N existe Frequencia"));
+        frequencyRepository.findById(frequencyId).orElseThrow(() -> new RuntimeException("N existe Frequencia"));
 
-        for (Attendance attendance : frequency.getAttendances()) {
-            if (attendance.getStudent().getEmail().equals(memberId)) {
-                attendance.setStatus(toAttendance);
-                frequencyRepository.save(frequency);
-                return;
-            }
-        }
+        var user = userRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("Membro n existe"));
+
+        var remove = Attendance.builder()
+                .student(user)
+                .status(null)
+                .build();
+
+        frequencyRepository.pull(frequencyId, "attendances", remove);
 
         frequencyRepository.addInSet(frequencyId, "attendances", Attendance.builder()
-                .student(userRepository.findById(memberId).orElseThrow(() -> new RuntimeException("Membro n existe")))
+                .student(user)
                 .status(toAttendance)
                 .build()
         );
