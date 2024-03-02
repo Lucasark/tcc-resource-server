@@ -50,9 +50,9 @@ public class FrequencyDocument {
     private Long version;
 
     @CreatedDate
-    protected LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    protected LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
 }

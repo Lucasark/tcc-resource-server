@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface FrequencyRepository extends MongoRepository<FrequencyDocument, String>, CustomizedFrequencyRepository {
+public interface FrequencyRepository extends MongoRepository<FrequencyDocument, String>, MongoHelperRepository<FrequencyDocument, String> {
 
     List<FrequencyDocument> findAllByCourseId(String courseId);
 

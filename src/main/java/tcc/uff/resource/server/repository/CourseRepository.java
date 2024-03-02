@@ -8,7 +8,7 @@ import tcc.uff.resource.server.model.response.entity.FrequencyMapperResponse;
 import java.time.Instant;
 import java.util.List;
 
-public interface CourseRepository extends MongoRepository<CourseDocument, String>, CustomizedCourseRepository {
+public interface CourseRepository extends MongoRepository<CourseDocument, String>, MongoHelperRepository<CourseDocument, String> {
 
     List<CourseDocument> findByTeacherEmail(String user);
 
