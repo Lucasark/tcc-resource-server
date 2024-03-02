@@ -1,6 +1,7 @@
 package tcc.uff.resource.server.handler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -31,6 +32,22 @@ public class ControllerAdviceExceptionHandler {
                 .body(ErrorResponse.builder()
                         .message(eThrowable.getMessage())
                         .description("Temporario - Temporario")
+                        .build()
+                );
+    }
+
+    @ExceptionHandler(value = {RuntimeException.class})
+    public ResponseEntity<ErrorResponse> handleException(RuntimeException eThrowable) {
+
+        log.error("GENERICO:", eThrowable);
+
+        String stacktrace = ExceptionUtils.getStackTrace(eThrowable);
+
+
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                .body(ErrorResponse.builder()
+                        .message(eThrowable.getMessage())
+                        .description(stacktrace)
                         .build()
                 );
     }
