@@ -78,6 +78,7 @@ public class FrequencyServiceImpl {
         getLastStartedFrequencyByCourse(courseId).ifPresent(this::endFrenquecyByCourse);
     }
 
+    //TODO: Refatorar
     public boolean isTeacherInFrequency(String teacher, String frequencyId) {
         log.info("AQUI1-A");
         var frequecy = frequencyRepository.findById(frequencyId)
