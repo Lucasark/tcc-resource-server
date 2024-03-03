@@ -124,8 +124,6 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .build()
         );
 
-        log.info("AQUI5");
-
     }
 
     @Override
