@@ -74,7 +74,7 @@ public class FrequencyServiceImpl {
 
     public boolean isTeacherInFrequency(String teacher, String frequencyId) {
         var count = frequencyRepository.countIdAndCourseTeacherEmail(frequencyId, teacher);
-        return Objects.nonNull(count.getTotal()) && count.getTotal() > 0;
+        return Objects.nonNull(count) && count.getTotal() > 0;
     }
 
     public List<FrequencyDocument> allFinishedFrequencyByCourse(String courseId) {
