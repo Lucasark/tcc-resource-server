@@ -9,6 +9,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -21,7 +23,7 @@ import java.util.Set;
 @Document(collection = "users")
 public class UserDocument {
 
-    @Id
+    @MongoId(targetType = FieldType.STRING)
     private String email;
 
     /**
