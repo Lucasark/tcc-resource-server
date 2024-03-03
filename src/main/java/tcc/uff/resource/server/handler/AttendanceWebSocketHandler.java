@@ -11,6 +11,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
+import tcc.uff.resource.server.exceptions.GenericException;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
 import tcc.uff.resource.server.model.enums.AttendanceOriginEnum;
 import tcc.uff.resource.server.model.enums.CommandRequestEnum;
@@ -175,7 +176,7 @@ public class AttendanceWebSocketHandler extends AbstractWebSocketHandler {
         try {
             session.close(CloseStatus.NORMAL.withReason(new ObjectMapper().writeValueAsString(response)));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new GenericException(e);
         }
     }
 

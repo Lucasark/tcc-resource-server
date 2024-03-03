@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import tcc.uff.resource.server.exceptions.AttendanceException;
+import tcc.uff.resource.server.exceptions.GenericException;
 import tcc.uff.resource.server.model.document.Attendance;
 import tcc.uff.resource.server.model.document.UserAlias;
 import tcc.uff.resource.server.model.enums.AttendanceEnum;
@@ -40,10 +41,10 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         if (Objects.nonNull(attendanceHandler) && attendanceHandler.getCode().equals(code)) {
             var frequency = frequencyRepository.findByDateAndCourseId(attendanceHandler.getDate(), course)
-                    .orElseThrow(() -> new RuntimeException("Frequencia n existe!"));
+                    .orElseThrow(() -> new GenericException("Frequencia n existe!"));
 
             var user = userRepository.findById(member)
-                    .orElseThrow(() -> new RuntimeException("N achou User!"));
+                    .orElseThrow(() -> new GenericException("N achou User!"));
 
             //TODO: dá pra melhorar
             var attendence = frequency.getAttendances().stream()
@@ -109,7 +110,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         var toAttendance = AttendanceEnum.fromId(status);
 
         var user = userRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("Membro n existe"));
+                .orElseThrow(() -> new GenericException("Membro n existe"));
 
         var remove = Attendance.builder()
                 .student(user)

@@ -3,6 +3,7 @@ package tcc.uff.resource.server.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import tcc.uff.resource.server.exceptions.GenericException;
 import tcc.uff.resource.server.model.document.Attendance;
 import tcc.uff.resource.server.model.document.CourseDocument;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
@@ -30,15 +31,15 @@ public class FrequencyServiceImpl {
 
     private final FrequencyRepository frequencyRepository;
 
-    public void initFrenquency(String courseId, Instant date) throws RuntimeException {
+    public void initFrenquency(String courseId, Instant date) throws GenericException {
 
         var courseDocument = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("N achou Classe!"));
+                .orElseThrow(() -> new GenericException("N achou Classe!"));
 
         initFrenquency(courseDocument, date);
     }
 
-    public void initFrenquency(CourseDocument courseDocument, Instant date) throws RuntimeException {
+    public void initFrenquency(CourseDocument courseDocument, Instant date) throws GenericException {
 
         Set<Attendance> attendances = new HashSet<>();
 
@@ -79,7 +80,7 @@ public class FrequencyServiceImpl {
 
     public List<FrequencyDocument> allFinishedFrequencyByCourse(String courseId) {
 
-        var course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Curso n existe!"));
+        var course = courseRepository.findById(courseId).orElseThrow(() -> new GenericException("Curso n existe!"));
 
         return frequencyRepository.findByIdInAndFinished(course.getFrequencies(), Boolean.TRUE);
 
@@ -93,7 +94,7 @@ public class FrequencyServiceImpl {
 
     public Optional<FrequencyDocument> getLastStartedFrequencyByCourse(String courseId) {
 
-        var course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Curso n existe!"));
+        var course = courseRepository.findById(courseId).orElseThrow(() -> new GenericException("Curso n existe!"));
 
         var frequencies = frequencyRepository.findFirst1ByIdInAndFinishedOrderByDate(course.getFrequencies(), Boolean.FALSE);
 
@@ -119,6 +120,7 @@ public class FrequencyServiceImpl {
         return courseRepository.getViewFrequencyByCourseId(courseId);
     }
 
+    //TODO: Tem que otimizar On^3
     public List<FrequencyResponse> getAllFrequenciesOfMember(String courseId, String memberId) {
         var frequecies = frequencyRepository.findAllByCourseId(courseId);
 

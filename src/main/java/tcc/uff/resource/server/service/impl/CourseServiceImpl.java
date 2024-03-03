@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import tcc.uff.resource.server.converter.CourseResponseConverter;
+import tcc.uff.resource.server.exceptions.GenericException;
 import tcc.uff.resource.server.model.document.CourseDocument;
 import tcc.uff.resource.server.model.document.DaysOfWeek;
 import tcc.uff.resource.server.model.document.UserAlias;
@@ -59,7 +60,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseResponse createCourse(CourseRequest courseRequest, String owner) {
         var curse = this.mapper.map(courseRequest, CourseDocument.class);
-        var user = userRepository.findById(owner).orElseThrow(() -> new RuntimeException("N achou o User!"));
+        var user = userRepository.findById(owner).orElseThrow(() -> new GenericException("N achou o User!"));
         curse.setTeacher(user);
         courseRepository.save(curse);
         return courseResponseConverter.toCourseResponse(curse);
@@ -67,7 +68,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseResponse putCourse(CourseRequest courseRequest, String courseId) {
-        var document = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("N achou o curso!"));
+        var document = courseRepository.findById(courseId).orElseThrow(() -> new GenericException("N achou o curso!"));
 
         document.setName(courseRequest.getName());
         document.setPeriod(courseRequest.getPeriod());
@@ -83,7 +84,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public void deleteCourse(String courseId) {
         var document = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("N achou o curso!"));
+                .orElseThrow(() -> new GenericException("N achou o curso!"));
 
         document.getMembers().forEach(user -> {
             user.getAliases().removeIf(userPredicate -> userPredicate.getCourseId().equals(courseId));
@@ -96,20 +97,20 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseResponse getCourse(String courseId) {
         return courseResponseConverter.toCourseResponse(courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("N achou o curso!")));
+                .orElseThrow(() -> new GenericException("N achou o curso!")));
     }
 
 
     @Override
     public CourseResponse addMember(String courseId, String memberId, String memberAlias, String memberRegistration) {
         var document = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("N achou o curso!"));
+                .orElseThrow(() -> new GenericException("N achou o curso!"));
 
         if (document.getMembers().stream().anyMatch(user -> user.getEmail().equals(memberId)))
-            throw new RuntimeException("Já está incluso!");
+            throw new GenericException("Já está incluso!");
 
         if (document.getTeacher().getEmail().equals(memberId))
-            throw new RuntimeException("Voce n pode se incluir como membro sendo dono!");
+            throw new GenericException("Voce n pode se incluir como membro sendo dono!");
 
         var user = userRepository.findById(memberId)
                 .orElseGet(() -> {
@@ -132,7 +133,7 @@ public class CourseServiceImpl implements CourseService {
         courseRepository.addInSet(courseId, "members", user);
 
         return courseResponseConverter.toCourseResponse(courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Erro ao recuperar"))
+                .orElseThrow(() -> new GenericException("Erro ao recuperar"))
         );
     }
 

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import tcc.uff.resource.server.exceptions.AttendanceException;
+import tcc.uff.resource.server.exceptions.GenericException;
 import tcc.uff.resource.server.exceptions.TempException;
 import tcc.uff.resource.server.model.response.ErrorResponse;
 
@@ -36,8 +37,8 @@ public class ControllerAdviceExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(value = {RuntimeException.class})
-    public ResponseEntity<ErrorResponse> handleException(RuntimeException eThrowable) {
+    @ExceptionHandler(value = {GenericException.class})
+    public ResponseEntity<ErrorResponse> handleException(GenericException eThrowable) {
 
         log.error("GENERICO:", eThrowable);
 
