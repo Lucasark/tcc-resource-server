@@ -108,10 +108,6 @@ public class AttendanceServiceImpl implements AttendanceService {
     public void updateAttedentceStatusByMember(String frequencyId, String memberId, Integer status) {
         var toAttendance = AttendanceEnum.fromId(status);
 
-//        log.info("AQUI1");
-//        frequencyRepository.findById(frequencyId).orElseThrow(() -> new RuntimeException("N existe Frequencia"));
-
-        log.info("AQUI2");
         var user = userRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("Membro n existe"));
 
@@ -120,10 +116,8 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .status(null)
                 .build();
 
-        log.info("AQUI3");
         frequencyRepository.pull(frequencyId, "attendances", remove);
 
-        log.info("AQUI4");
         frequencyRepository.addInSet(frequencyId, "attendances", Attendance.builder()
                 .student(user)
                 .status(toAttendance)
