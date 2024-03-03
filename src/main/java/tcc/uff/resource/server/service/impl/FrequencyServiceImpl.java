@@ -7,16 +7,10 @@ import tcc.uff.resource.server.model.document.Attendance;
 import tcc.uff.resource.server.model.document.CourseDocument;
 import tcc.uff.resource.server.model.document.FrequencyDocument;
 import tcc.uff.resource.server.model.enums.AttendanceEnum;
-import tcc.uff.resource.server.model.enums.AttendanceOriginEnum;
-import tcc.uff.resource.server.model.enums.CommandRequestEnum;
-import tcc.uff.resource.server.model.handler.AttendanceHandler;
-import tcc.uff.resource.server.model.request.AttendanceRequest;
-import tcc.uff.resource.server.model.response.FrequencyHandlerResponse;
 import tcc.uff.resource.server.model.response.entity.FrequencyMapperResponse;
 import tcc.uff.resource.server.model.response.entity.FrequencyResponse;
 import tcc.uff.resource.server.repository.CourseRepository;
 import tcc.uff.resource.server.repository.FrequencyRepository;
-import tcc.uff.resource.server.utils.GenerateString;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -25,8 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import static java.util.stream.Collectors.toMap;
 
 @Slf4j
 @Service
@@ -78,15 +70,10 @@ public class FrequencyServiceImpl {
         getLastStartedFrequencyByCourse(courseId).ifPresent(this::endFrenquecyByCourse);
     }
 
-    //TODO: Refatorar
+
     public boolean isTeacherInFrequency(String teacher, String frequencyId) {
-        log.info("AQUI1-A");
-        var frequecy = frequencyRepository.findById(frequencyId)
-                .orElseThrow(() -> new RuntimeException("Frequencia n existe"));
-        log.info("AQUI1-B");
-        var a = frequecy.getCourse().getTeacher().getEmail().equals(teacher);
-        log.info("AQUI1-C");
-        return a;
+        var count = frequencyRepository.countIdAndCourseTeacherEmail(frequencyId, teacher);
+        return count.getTotal() > 0;
     }
 
     public List<FrequencyDocument> allFinishedFrequencyByCourse(String courseId) {
