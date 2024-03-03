@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -73,7 +74,7 @@ public class FrequencyServiceImpl {
 
     public boolean isTeacherInFrequency(String teacher, String frequencyId) {
         var count = frequencyRepository.countIdAndCourseTeacherEmail(frequencyId, teacher);
-        return count.getTotal() > 0;
+        return Objects.nonNull(count.getTotal()) && count.getTotal() > 0;
     }
 
     public List<FrequencyDocument> allFinishedFrequencyByCourse(String courseId) {
