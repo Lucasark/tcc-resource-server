@@ -51,7 +51,9 @@ public class AttendanceController {
                                                                @PathVariable String frequencyId,
                                                                @PathVariable String memberId
     ) {
+        log.info("AQUIINIT");
         attendanceService.updateAttedentceStatusByMember(frequencyId, memberId, attendancePatchRequest.getStatus());
+        log.info("AQUIFIM");
         return ResponseEntity.ok().build();
     }
 
