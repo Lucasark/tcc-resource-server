@@ -108,8 +108,8 @@ public class AttendanceServiceImpl implements AttendanceService {
     public void updateAttedentceStatusByMember(String frequencyId, String memberId, Integer status) {
         var toAttendance = AttendanceEnum.fromId(status);
 
-        log.info("AQUI1");
-        frequencyRepository.findById(frequencyId).orElseThrow(() -> new RuntimeException("N existe Frequencia"));
+//        log.info("AQUI1");
+//        frequencyRepository.findById(frequencyId).orElseThrow(() -> new RuntimeException("N existe Frequencia"));
 
         log.info("AQUI2");
         var user = userRepository.findById(memberId)

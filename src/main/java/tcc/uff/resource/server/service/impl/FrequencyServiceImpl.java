@@ -79,10 +79,13 @@ public class FrequencyServiceImpl {
     }
 
     public boolean isTeacherInFrequency(String teacher, String frequencyId) {
+        log.info("AQUI1-A");
         var frequecy = frequencyRepository.findById(frequencyId)
                 .orElseThrow(() -> new RuntimeException("Frequencia n existe"));
-
-        return frequecy.getCourse().getTeacher().getEmail().equals(teacher);
+        log.info("AQUI1-B");
+        var a = frequecy.getCourse().getTeacher().getEmail().equals(teacher);
+        log.info("AQUI1-C");
+        return a;
     }
 
     public List<FrequencyDocument> allFinishedFrequencyByCourse(String courseId) {
