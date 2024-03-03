@@ -46,7 +46,7 @@ public class AttendanceController {
     @PatchMapping("/frequencies/{frequencyId}/members/{memberId}")
     @Operation(summary = "Atualizar a Presença de um Curso de um Membro")
     //TODO: Otimizar
-    @PreAuthorize("@preAuthorize.isOwnerCourseByFrequency(authentication.name, #frequencyId)")
+//    @PreAuthorize("@preAuthorize.isOwnerCourseByFrequency(authentication.name, #frequencyId)")
     public ResponseEntity<Void> updateAttedentceStatusByMember(Authentication authentication,
                                                                @Valid @RequestBody AttendancePatchRequest attendancePatchRequest,
                                                                @PathVariable String frequencyId,
