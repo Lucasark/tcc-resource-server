@@ -3,6 +3,7 @@ package tcc.uff.resource.server.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import tcc.uff.resource.server.exceptions.GenericException;
 import tcc.uff.resource.server.model.enums.AttendanceOriginEnum;
 import tcc.uff.resource.server.model.enums.CommandRequestEnum;
 import tcc.uff.resource.server.model.handler.AttendanceHandler;
@@ -25,7 +26,7 @@ public class FrequencyHandlerServiceImpl {
     public FrequencyHandlerResponse handlerFrenquency(String courseId, AttendanceRequest request) throws RuntimeException {
 
         var courseDocument = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("N achou Classe!"));
+                .orElseThrow(() -> new GenericException("N achou Classe!"));
 
         if (CommandRequestEnum.START.equals(request.getType())) {
 

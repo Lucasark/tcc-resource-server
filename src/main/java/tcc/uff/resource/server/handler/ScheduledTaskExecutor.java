@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
+import tcc.uff.resource.server.exceptions.GenericException;
 import tcc.uff.resource.server.model.enums.CommandResponseWebSocketEnum;
 import tcc.uff.resource.server.model.handler.AttendanceHandler;
 import tcc.uff.resource.server.model.request.WebSocketResponse;
@@ -51,7 +52,7 @@ public class ScheduledTaskExecutor implements Runnable {
                 }
                 attendance.setRepeat(attendance.getRepeat() + 1);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new GenericException(e);
             }
         } else {
             var response = ErrorResponse.builder()
@@ -63,7 +64,7 @@ public class ScheduledTaskExecutor implements Runnable {
             try {
                 attendance.getSession().close(CloseStatus.NORMAL.withReason(new ObjectMapper().writeValueAsString(response)));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new GenericException(e);
             }
 
             attendanceService.removeAttendanceByCourseId(attendance.getCourseId());
