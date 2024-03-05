@@ -18,6 +18,8 @@ public class FrequencyMapperResponse {
 
     private String alias;
 
+    private String registration;
+
     @Builder.Default
     private Set<FrequencyResponse> frequencies = new HashSet<>();
 }

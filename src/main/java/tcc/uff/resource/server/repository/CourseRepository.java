@@ -39,7 +39,7 @@ public interface CourseRepository extends MongoRepository<CourseDocument, String
                     "date: '$$frequency.date'," +
                     "status: {$arrayElemAt: [{$map: {input: {$filter: {input: '$$frequency.attendances', as: 'attendance', cond: {$eq: ['$$attendance.student.$id', '$user._id']},}}, as: 'filteredAttendance', in: '$$filteredAttendance.status'}}, 0]" +
                     "}}}}}}",
-            "{$project: {_id: 0, id: {$toString :'$user._id'}, alias: '$alias', frequencies: '$frequenciesWithMatchingAttendances'}}"
+            "{$project: {_id: 0, id: {$toString :'$user._id'}, alias: '$alias', registration: '$user.registration', frequencies: '$frequenciesWithMatchingAttendances'}}"
     })
     List<FrequencyMapperResponse> getViewFrequencyByCourseId(String courseId);
 
@@ -70,7 +70,7 @@ public interface CourseRepository extends MongoRepository<CourseDocument, String
                     "date: '$$frequency.date'," +
                     "status: {$arrayElemAt: [{$map: {input: {$filter: {input: '$$frequency.attendances', as: 'attendance', cond: {$eq: ['$$attendance.student.$id', '$user._id']},}}, as: 'filteredAttendance', in: '$$filteredAttendance.status'}}, 0]" +
                     "}}}}}}",
-            "{$project: {_id: 0, id: {$toString :'$user._id'}, alias: '$alias', frequencies: '$frequenciesWithMatchingAttendances'}}"
+            "{$project: {_id: 0, id: {$toString :'$user._id'}, alias: '$alias', registration: '$user.registration', frequencies: '$frequenciesWithMatchingAttendances'}}"
     })
     List<FrequencyMapperResponse> getViewFrequencyByCourseIdAndDate(String courseId, Instant start, Instant end);
 }
