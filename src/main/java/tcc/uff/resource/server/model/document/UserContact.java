@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Field;
 import tcc.uff.resource.server.model.enums.UserContactEnum;
 
 @Getter
@@ -14,7 +15,8 @@ import tcc.uff.resource.server.model.enums.UserContactEnum;
 @NoArgsConstructor
 public class UserContact {
 
-    private UserContactEnum type;
+    @Field("id")
+    private UserContactEnum id;
 
     private String value;
 }

@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class Periods implements Serializable {
+public class PeriodsOptionsResponse implements Serializable {
 
     private List<SelectOption> periods;
 

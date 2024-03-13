@@ -9,9 +9,9 @@ import tcc.uff.resource.server.model.enums.AttendanceEnum;
 import tcc.uff.resource.server.model.enums.UserContactEnum;
 import tcc.uff.resource.server.model.response.GenericOption;
 import tcc.uff.resource.server.model.response.SelectOption;
-import tcc.uff.resource.server.model.response.models.Frequencies;
-import tcc.uff.resource.server.model.response.models.Periods;
-import tcc.uff.resource.server.model.response.models.UserContact;
+import tcc.uff.resource.server.model.response.models.FrequenciesOptionsResponse;
+import tcc.uff.resource.server.model.response.models.PeriodsOptionsResponse;
+import tcc.uff.resource.server.model.response.models.UserContactOptionsResponse;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,13 +25,13 @@ public class ModelController {
     private final ModelMapper modelMapper;
 
     @GetMapping("/periods")
-    public Periods getPeriods() {
+    public PeriodsOptionsResponse getPeriods() {
 
         var format = "%s.%s";
 
         var year = LocalDate.now().getYear();
 
-        return Periods.builder()
+        return PeriodsOptionsResponse.builder()
                 .periods(Arrays.asList(
                         SelectOption.builder().option(String.format(format, year, 1)).build(),
                         SelectOption.builder().option(String.format(format, year, 2)).build()
@@ -40,7 +40,7 @@ public class ModelController {
     }
 
     @GetMapping("/frequencies")
-    public Frequencies getFrequencies() {
+    public FrequenciesOptionsResponse getFrequencies() {
 
         var frequencies = AttendanceEnum.getAllAttrbsSortedById();
 
@@ -54,17 +54,17 @@ public class ModelController {
                         .build())
         );
 
-        return Frequencies.builder()
+        return FrequenciesOptionsResponse.builder()
                 .frequencies(frequenciesResponse)
                 .build();
     }
 
     @GetMapping("/user-contacts")
-    public UserContact getUserContacts() {
+    public UserContactOptionsResponse getUserContacts() {
 
         var contacts = UserContactEnum.getAllAttrbsSortedById();
 
-        return UserContact.builder()
+        return UserContactOptionsResponse.builder()
                 .contacts(contacts.stream().map(contact -> modelMapper.map(contact, GenericOption.class)).toList())
                 .build();
     }
