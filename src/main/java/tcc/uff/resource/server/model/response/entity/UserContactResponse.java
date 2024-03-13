@@ -15,6 +15,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class UserContactResponse implements Serializable {
 
+    private Integer id;
+
     private String type;
 
     private String value;

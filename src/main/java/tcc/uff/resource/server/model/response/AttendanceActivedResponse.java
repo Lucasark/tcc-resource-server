@@ -3,8 +3,8 @@ package tcc.uff.resource.server.model.response;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import tcc.uff.resource.server.model.enums.AttendanceStatusEnum;
 import tcc.uff.resource.server.model.enums.AttendanceOriginEnum;
+import tcc.uff.resource.server.model.enums.AttendanceStatusEnum;
 
 @Getter
 @Setter

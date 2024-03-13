@@ -2,19 +2,20 @@ package tcc.uff.resource.server.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import tcc.uff.resource.server.model.enums.UserContactEnum;
+import lombok.Setter;
 
 import java.io.Serializable;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserPatchContactRequest implements Serializable {
 
-    private UserContactEnum type;
+    private Integer id;
 
     private String value;
 

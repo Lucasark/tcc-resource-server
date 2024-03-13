@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class UserContact implements Serializable {
+public class UserContactOptionsResponse implements Serializable {
 
     private List<GenericOption> contacts;
 }

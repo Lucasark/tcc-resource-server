@@ -1,4 +1,4 @@
-package tcc.uff.resource.server.model.response.relation.teachercourse;
+package tcc.uff.resource.server.model.response.relation;
 
 import lombok.Builder;
 import lombok.Getter;
